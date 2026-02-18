@@ -1,6 +1,6 @@
-flask
-flask-mysqldb
-fpdf
-werkzeug
-gunicorn
-mysqlclient
+Flask==3.0.3
+Flask-MySQLdb==2.0.0
+fpdf==1.7.2
+Werkzeug==3.0.3
+mysqlclient==2.2.4
+gunicorn==22.0.0
