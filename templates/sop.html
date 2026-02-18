@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-8">
+    <div class="bg-white rounded-[30px] shadow-xl overflow-hidden border border-gray-100">
+        <div class="bg-dombaGreen p-8 text-white flex justify-between items-center">
+            <div>
+                <h3 class="text-2xl font-black uppercase italic">Panduan SOP & Jadwal Operasional</h3>
+                <p class="text-dombaYellow text-xs font-bold uppercase tracking-widest">Standard Operating Procedure - Dombastis</p>
+            </div>
+            <i class="fas fa-clipboard-list text-4xl opacity-20"></i>
+        </div>
+    </div>
+
+    {% if session['role'] == 'admin' %}
+    <div class="flex justify-end mb-4">
+        <a href="{{ url_for('tambah_sop') }}" class="bg-dombaGreen hover:bg-dombaDark text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg transition-all flex items-center gap-2">
+            <i class="fas fa-plus-circle"></i> Tambah SOP Baru
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-[30px] shadow-lg overflow-hidden border border-gray-100">
+        <div class="bg-dombaGreen/90 p-5 text-white flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-dombaYellow rounded-full flex items-center justify-center text-dombaGreen font-black shadow-md">A</div>
+                <h4 class="font-black uppercase tracking-tight">Kandang Timur (Jobdesk: Andik)</h4>
+            </div>
+            <span class="text-[10px] bg-white/10 px-3 py-1 rounded-full font-bold uppercase border border-white/20">Area A</span>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for s in sops if s[4] == 'Andik' or s[4] == 'Semua' %}
+            <div class="p-6 border border-gray-100 rounded-3xl bg-gray-50/50 hover:shadow-md transition relative group">
+                <div class="flex justify-between items-start mb-4">
+                    <h5 class="font-black text-dombaGreen uppercase text-sm">{{ s[1] }}</h5>
+                    <div class="flex gap-2">
+                        <form action="{{ url_for('lapor_tugas') }}" method="POST">
+                            <input type="hidden" name="sop_id" value="{{ s[0] }}">
+                            <button type="submit" class="text-[10px] bg-blue-500 text-white px-3 py-1 rounded-full hover:bg-blue-600 transition font-bold shadow-sm">
+                                <i class="fas fa-check-circle mr-1"></i> Selesai
+                            </button>
+                        </form>
+
+                        {% if session['role'] == 'admin' %}
+                        <a href="{{ url_for('edit_sop', id=s[0]) }}" class="text-[10px] bg-dombaGreen text-white px-3 py-1 rounded-full hover:bg-dombaYellow hover:text-dombaGreen transition font-bold shadow-sm">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black text-gray-400 uppercase w-24">Waktu/Takaran:</span>
+                        <span class="text-xs font-bold text-gray-700 bg-white px-3 py-1 rounded-lg border border-gray-100 shadow-sm">{{ s[2] }}</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="text-[10px] font-black text-gray-400 uppercase w-24 mt-1">Instruksi:</span>
+                        <p class="text-xs text-gray-500 leading-relaxed italic">{{ s[3] }}</p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-xs text-gray-400 font-bold italic p-4">Belum ada agenda untuk Area A.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[30px] shadow-lg overflow-hidden border border-gray-100">
+        <div class="bg-dombaYellow p-5 text-dombaGreen flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-dombaGreen rounded-full flex items-center justify-center text-white font-black shadow-md">B/C</div>
+                <h4 class="font-black uppercase tracking-tight">Kandang Barat & Tengah (Jobdesk: Fajar)</h4>
+            </div>
+            <span class="text-[10px] bg-dombaGreen/10 px-3 py-1 rounded-full font-bold uppercase text-dombaGreen border border-dombaGreen/20">Area B & C</span>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for s in sops if s[4] == 'Fajar' %}
+            <div class="p-6 border border-gray-100 rounded-3xl bg-gray-50/50 hover:shadow-md transition relative group">
+                <div class="flex justify-between items-start mb-4">
+                    <h5 class="font-black text-dombaGreen uppercase text-sm">{{ s[1] }}</h5>
+                    <div class="flex gap-2">
+                        <form action="{{ url_for('lapor_tugas') }}" method="POST">
+                            <input type="hidden" name="sop_id" value="{{ s[0] }}">
+                            <button type="submit" class="text-[10px] bg-blue-500 text-white px-3 py-1 rounded-full hover:bg-blue-600 transition font-bold shadow-sm">
+                                <i class="fas fa-check-circle mr-1"></i> Selesai
+                            </button>
+                        </form>
+
+                        {% if session['role'] == 'admin' %}
+                        <a href="{{ url_for('edit_sop', id=s[0]) }}" class="text-[10px] bg-dombaGreen text-white px-3 py-1 rounded-full hover:bg-dombaYellow hover:text-dombaGreen transition font-bold shadow-sm">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black text-gray-400 uppercase w-24">Waktu/Takaran:</span>
+                        <span class="text-xs font-bold text-gray-700 bg-white px-3 py-1 rounded-lg border border-gray-100 shadow-sm">{{ s[2] }}</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="text-[10px] font-black text-gray-400 uppercase w-24 mt-1">Instruksi:</span>
+                        <p class="text-xs text-gray-500 leading-relaxed italic">{{ s[3] }}</p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-xs text-gray-400 font-bold italic p-4">Belum ada agenda untuk Area B/C.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="p-6 bg-blue-50 rounded-[30px] border border-blue-100 flex items-center gap-6 shadow-inner">
+        <div class="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
+            <i class="fas fa-info-circle text-xl"></i>
+        </div>
+        <div>
+            <p class="text-sm font-bold text-blue-900">Catatan untuk Karyawan:</p>
+            <p class="text-xs text-blue-700 italic leading-relaxed">Pastikan mengisi <strong>Laporan Tugas</strong> (Klik tombol Selesai) setiap kali selesai melaksanakan agenda di atas agar terekam di sistem.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div data-aos="fade-right" class="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-8 border-b border-gray-50 flex justify-between items-center bg-white">
+            <div>
+                <h3 class="font-black text-[#2D5A27] text-xl uppercase italic tracking-tighter">Kelola Karyawan</h3>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Daftar Akun & Hak Akses Sistem</p>
+            </div>
+            <button class="bg-[#2D5A27] text-white text-[10px] font-black px-6 py-3 rounded-2xl hover:bg-[#1a3a18] transition shadow-lg shadow-[#2D5A27]/20 uppercase tracking-widest">
+                + Tambah Akun
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[10px] uppercase text-gray-500 font-black tracking-[0.2em]">
+                    <tr>
+                        <th class="px-8 py-5">Nama Pengguna</th>
+                        <th class="px-8 py-5">Role / Jabatan</th>
+                        <th class="px-8 py-5 text-center">Status</th>
+                        <th class="px-8 py-5 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50 text-sm">
+                    {% for u in users %}
+                    <tr class="hover:bg-gray-50/80 transition group">
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-black text-[#2D5A27]">
+                                    {{ u[1][0] | upper }}
+                                </div>
+                                <div>
+                                    <p class="font-black text-gray-700 uppercase">{{ u[1] }}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">ID: #00{{ u[0] }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter {{ 'bg-purple-100 text-purple-700' if u[2] == 'Admin' else 'bg-blue-100 text-blue-700' }}">
+                                {{ u[2] }}
+                            </span>
+                        </td>
+                        <td class="px-8 py-5 text-center">
+                            <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                            <span class="text-[10px] font-black uppercase text-gray-400">Aktif</span>
+                        </td>
+                        <td class="px-8 py-5">
+                            <div class="flex justify-center gap-2">
+                                <a href="#" class="w-8 h-8 rounded-xl bg-gray-50 text-gray-400 hover:bg-[#FFD700] hover:text-[#2D5A27] flex items-center justify-center transition">
+                                    <i class="fas fa-key text-xs"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 rounded-xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition">
+                                    <i class="fas fa-user-minus text-xs"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

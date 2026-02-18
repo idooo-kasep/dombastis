@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-8 text-center md:text-left">
+        <a href="{{ url_for('detail_domba', id=domba[0]) }}" class="text-gray-400 hover:text-dombaGreen text-sm font-bold flex items-center justify-center md:justify-start gap-2 mb-4 transition group">
+            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Batal & Kembali ke Profil
+        </a>
+        <h2 class="text-4xl font-black text-dombaGreen italic uppercase tracking-tighter">Edit Data Ternak</h2>
+        <p class="text-gray-500 font-medium">Memperbarui informasi untuk unit <span class="text-dombaGreen font-bold">{{ domba[1] }}</span></p>
+    </div>
+
+    <div class="bg-white p-8 md:p-12 rounded-[50px] shadow-2xl shadow-dombaGreen/5 border border-gray-100 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-dombaYellow rounded-full blur-3xl opacity-20 -mr-10 -mt-10"></div>
+
+        <form action="{{ url_for('edit', id=domba[0]) }}" method="POST" class="space-y-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Ear Tag ID</label>
+                    <div class="relative">
+                        <i class="fas fa-fingerprint absolute left-5 top-5 text-dombaGreen/30"></i>
+                        <input type="text" name="ear_tag" value="{{ domba[4] }}"
+                            class="w-full bg-gray-50 p-5 pl-14 rounded-2xl font-bold text-dombaGreen border-0 ring-1 ring-gray-200 outline-none focus:ring-2 focus:ring-dombaYellow transition shadow-sm">
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Nama Domba</label>
+                    <div class="relative">
+                        <i class="fas fa-tag absolute left-5 top-5 text-dombaGreen/30"></i>
+                        <input type="text" name="nama" value="{{ domba[1] }}" required
+                            class="w-full bg-gray-50 p-5 pl-14 rounded-2xl font-bold text-dombaGreen border-0 ring-1 ring-gray-200 outline-none focus:ring-2 focus:ring-dombaYellow transition shadow-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Jenis / Ras Domba</label>
+                <div class="relative">
+                    <i class="fas fa-dna absolute left-5 top-5 text-dombaGreen/30"></i>
+                    <input type="text" name="jenis" value="{{ domba[5] }}"
+                        class="w-full bg-gray-50 p-5 pl-14 rounded-2xl font-bold text-dombaGreen border-0 ring-1 ring-gray-200 outline-none focus:ring-2 focus:ring-dombaYellow transition shadow-sm">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Jenis Kelamin</label>
+                    <div class="relative">
+                        <i class="fas fa-venus-mars absolute left-5 top-5 text-dombaGreen/30 pointer-events-none"></i>
+                        <select name="jk" class="w-full bg-gray-50 p-5 pl-14 rounded-2xl font-bold text-dombaGreen border-0 ring-1 ring-gray-200 outline-none focus:ring-2 focus:ring-dombaYellow transition shadow-sm appearance-none cursor-pointer">
+                            <option value="Jantan" {{ 'selected' if domba[2] == 'Jantan' }}>Jantan</option>
+                            <option value="Betina" {{ 'selected' if domba[2] == 'Betina' }}>Betina</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-5 top-5 text-gray-300 pointer-events-none"></i>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Berat Badan (Kg)</label>
+                    <div class="relative">
+                        <i class="fas fa-weight-hanging absolute left-5 top-5 text-dombaGreen/30"></i>
+                        <input type="number" step="0.1" name="berat" value="{{ domba[3] }}" required
+                            class="w-full bg-gray-50 p-5 pl-14 rounded-2xl font-bold text-dombaGreen border-0 ring-1 ring-gray-200 outline-none focus:ring-2 focus:ring-dombaYellow transition shadow-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-dashed border-gray-100 pt-8">
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Lokasi Kandang</label>
+                    <div class="relative">
+                        <i class="fas fa-map-marker-alt absolute left-5 top-5 text-dombaGreen/30"></i>
+                        <select name="lokasi" class="w-full bg-gray-50 p-5 pl-14 rounded-2xl font-bold text-dombaGreen border-0 ring-1 ring-gray-200 outline-none focus:ring-2 focus:ring-dombaYellow transition shadow-sm appearance-none cursor-pointer">
+                            <option value="Barat" {{ 'selected' if domba[6] == 'Barat' }}>Barat</option>
+                            <option value="Timur" {{ 'selected' if domba[6] == 'Timur' }}>Timur</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Nomor Kamar / Koloni</label>
+                    <div class="relative">
+                        <i class="fas fa-door-closed absolute left-5 top-5 text-dombaGreen/30"></i>
+                        <input type="number" name="kamar" value="{{ domba[7] }}" required
+                            class="w-full bg-gray-50 p-5 pl-14 rounded-2xl font-bold text-dombaGreen border-0 ring-1 ring-gray-200 outline-none focus:ring-2 focus:ring-dombaYellow transition shadow-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 flex flex-col md:flex-row gap-4">
+                <button type="submit" class="flex-1 bg-dombaGreen text-white font-black py-5 rounded-[25px] shadow-xl shadow-dombaGreen/20 hover:bg-dombaDark hover:-translate-y-1 transition transform active:scale-95 flex items-center justify-center gap-3">
+                    <i class="fas fa-save text-xl"></i>
+                    <span>SIMPAN PERUBAHAN</span>
+                </button>
+                <a href="{{ url_for('detail_domba', id=domba[0]) }}"
+                   class="bg-gray-100 text-gray-400 font-black px-10 py-5 rounded-[25px] hover:bg-gray-200 transition text-center uppercase tracking-widest text-xs flex items-center justify-center">
+                    Batal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

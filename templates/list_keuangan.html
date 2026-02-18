@@ -1,0 +1,170 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mx-auto space-y-8" data-aos="fade-up">
+
+    <!-- Ringkasan -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 hover-up relative overflow-hidden group">
+            <div class="relative z-10">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Total Saldo Kas</p>
+                <h2 class="text-3xl font-black text-[#2D5A27] tracking-tighter italic">
+                    Rp {{ "{:,.0f}".format(saldo) if saldo else "0" }}
+                </h2>
+                <div class="mt-4 flex items-center gap-2 text-green-500 font-bold text-[10px]">
+                    <i class="fas fa-check-circle"></i> Update Real-time
+                </div>
+            </div>
+            <i class="fas fa-wallet absolute -right-4 -bottom-4 text-8xl text-gray-50 group-hover:text-yellow-100 transition-colors"></i>
+        </div>
+
+        <div class="bg-[#2D5A27] p-8 rounded-[40px] shadow-xl shadow-[#2D5A27]/20 hover-up relative overflow-hidden group">
+            <div class="relative z-10 text-white">
+                <p class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">Pemasukan (Total)</p>
+                <h2 class="text-3xl font-black text-yellow-400 tracking-tighter italic">
+                    Rp {{ "{:,.0f}".format(masuk) if masuk else "0" }}
+                </h2>
+                <p class="text-[9px] mt-4 font-bold text-white/40 uppercase tracking-widest">Akumulasi Arus Kas Masuk</p>
+            </div>
+            <i class="fas fa-chart-line absolute -right-4 -bottom-4 text-8xl text-white/5"></i>
+        </div>
+
+        <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 hover-up relative overflow-hidden group">
+            <div class="relative z-10">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Pengeluaran (Total)</p>
+                <h2 class="text-3xl font-black text-red-500 tracking-tighter italic">
+                    Rp {{ "{:,.0f}".format(keluar) if keluar else "0" }}
+                </h2>
+                <div class="mt-4 flex items-center gap-2 text-red-400 font-bold text-[10px]">
+                    <i class="fas fa-arrow-down"></i> Total Biaya Operasional
+                </div>
+            </div>
+            <i class="fas fa-receipt absolute -right-4 -bottom-4 text-8xl text-gray-50 group-hover:text-red-50"></i>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-8 border-b border-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/50">
+            <div>
+                <h3 class="font-black text-[#2D5A27] text-xl uppercase italic tracking-tighter leading-none">Riwayat Keuangan</h3>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mt-2">Log Transaksi & Invoice Digital</p>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="window.print()" class="bg-gray-100 text-gray-500 text-[10px] font-black px-6 py-3 rounded-2xl hover:bg-gray-200 transition uppercase tracking-widest">
+                    <i class="fas fa-file-export mr-2"></i> Export PDF
+                </button>
+
+                <a href="{{ url_for('tambah_keuangan') }}" class="bg-[#2D5A27] text-white text-[10px] font-black px-6 py-3 rounded-2xl shadow-lg shadow-[#2D5A27]/20 btn-shine uppercase tracking-widest flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Transaksi Baru
+                </a>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50/50 text-[10px] uppercase text-gray-400 font-black tracking-widest">
+                    <tr>
+                        <th class="px-8 py-6">ID Invoice</th>
+                        <th class="px-8 py-6">Kategori & Deskripsi</th>
+                        <th class="px-8 py-6">Tanggal</th>
+                        <th class="px-8 py-6">Nominal</th>
+                        <th class="px-8 py-6 text-center">Status</th>
+                        <th class="px-8 py-6 text-center">Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-gray-50">
+                    {% for t in transaksi %}
+                    <tr class="hover:bg-gray-50/80 transition-all group">
+                        <!-- ID -->
+                        <td class="px-8 py-6">
+                            <span class="font-black text-gray-400 text-xs tracking-tighter uppercase group-hover:text-[#2D5A27]">
+                                #INV-{{ t[0] }}
+                            </span>
+                        </td>
+
+                        <!-- Kategori + Deskripsi -->
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center
+                                    {% if t[2] == 'Masuk' %}
+                                        bg-green-100 text-green-600
+                                    {% else %}
+                                        bg-red-100 text-red-600
+                                    {% endif %}
+                                ">
+                                    <i class="fas {% if t[2] == 'Masuk' %} fa-arrow-down {% else %} fa-arrow-up {% endif %} text-xs"></i>
+                                </div>
+
+                                <div>
+                                    <p class="font-black text-gray-700 text-sm uppercase tracking-tight">
+                                        {{ t[1] }}
+                                    </p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                        {{ t[3] }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Tanggal -->
+                        <td class="px-8 py-6">
+                            <p class="text-xs font-bold text-gray-500">
+                                {{ t[4] }}
+                            </p>
+                        </td>
+
+                        <!-- Nominal -->
+                        <td class="px-8 py-6">
+                            <span class="font-black {% if t[2] == 'Masuk' %} text-green-600 {% else %} text-red-500 {% endif %} tracking-tighter">
+                                {% if t[2] == 'Masuk' %}+{% else %}-{% endif %}
+                                Rp {{ "{:,.0f}".format(t[5]) }}
+                            </span>
+                        </td>
+
+                        <!-- Status -->
+                        <td class="px-8 py-6 text-center">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-green-200 bg-green-50 text-green-600">
+                                Berhasil
+                            </span>
+                        </td>
+
+                        <!-- Aksi -->
+                        <td class="px-8 py-6">
+                            <div class="flex justify-center gap-2">
+
+                                <!-- Detail (opsional) -->
+                                <a href="{{ url_for('detail_keuangan', id=t[0]) }}"
+                                   class="w-8 h-8 rounded-lg bg-white border border-gray-100 text-gray-400 hover:text-[#2D5A27] hover:border-[#2D5A27] transition flex items-center justify-center">
+                                    <i class="fas fa-eye text-xs"></i>
+                                </a>
+
+                                <!-- Hapus -->
+                                <a href="{{ url_for('hapus_keuangan', id=t[0]) }}"
+                                   onclick="return confirm('Hapus transaksi ini?')"
+                                   class="w-8 h-8 rounded-lg bg-white border border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-500 transition flex items-center justify-center">
+                                    <i class="fas fa-trash-alt text-xs"></i>
+                                </a>
+
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-8 py-12 text-center">
+                            <div class="flex flex-col items-center opacity-30">
+                                <i class="fas fa-receipt text-4xl mb-3"></i>
+                                <p class="text-xs font-bold uppercase tracking-widest">Belum ada data transaksi</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

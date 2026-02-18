@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dombastis - House of Sheep</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dombaGreen: '#0f4c3a',
+                        dombaYellow: '#ffc107',
+                        dombaLight: '#F3F6F5',
+                        dombaDark: '#0a3327'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        .custom-scroll::-webkit-scrollbar { width: 3px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,193,7,0.25); border-radius: 10px; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Nav link */
+        .nav-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 13px 16px; border-radius: 16px;
+            transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+            font-weight: 700; font-size: 13px;
+            color: rgba(255,255,255,0.45);
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); transform: translateX(4px); }
+        .nav-link.active { background: #ffc107; color: #0f4c3a !important; box-shadow: 0 6px 20px rgba(255,193,7,0.3); }
+        .nav-link.active i { color: #0f4c3a !important; }
+        .nav-link i { width: 20px; font-size: 15px; color: rgba(255,193,7,0.7); flex-shrink: 0; }
+
+        /* Penjualan special */
+        .nav-jual {
+            background: linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,193,7,0.05));
+            border: 1px solid rgba(255,193,7,0.22);
+            color: rgba(255,255,255,0.85) !important;
+        }
+        .nav-jual i { color: #ffc107 !important; }
+        .nav-jual:hover { background: rgba(255,193,7,0.22); }
+        .nav-jual.active { background: #ffc107; color: #0f4c3a !important; border-color: transparent; }
+
+        .hover-up { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-up:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.09); }
+
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after {
+            content: ''; position: absolute; top: -50%; left: -60%;
+            width: 30%; height: 200%;
+            background: rgba(255,255,255,0.15);
+            transform: skewX(-20deg); transition: left 0.4s ease;
+        }
+        .btn-shine:hover::after { left: 130%; }
+
+        /* Print */
+        @media print {
+            aside, header, .no-print, .fixed.bottom-0, .lg\:hidden { display: none !important; }
+            body { background: white !important; color: black !important; font-size: 11pt; }
+            main { overflow: visible !important; height: auto !important; }
+            .flex-1 { overflow: visible !important; padding: 0 !important; }
+            .print-only-header { display: block !important; text-align: center; border-bottom: 3px double #0f4c3a; padding-bottom: 12px; margin-bottom: 24px; }
+            table { width: 100%; border-collapse: collapse; }
+            tr { page-break-inside: avoid; }
+            th, td { border-bottom: 1px solid #eee !important; padding: 7px !important; }
+            [id*="modal"], .fixed.inset-0 { display: none !important; }
+        }
+        .print-only-header { display: none; }
+    </style>
+</head>
+<body class="bg-dombaLight text-gray-800 antialiased no-scrollbar">
+<div class="flex h-screen overflow-hidden">
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="w-[17rem] bg-dombaGreen text-white flex flex-col shadow-2xl z-20 hidden lg:flex flex-shrink-0">
+
+        <!-- Logo -->
+        <div class="flex flex-col items-center justify-center py-6 border-b border-white/5">
+            <i class="fas fa-sheep text-5xl text-dombaYellow mb-1 drop-shadow-lg"></i>
+            <h1 class="text-2xl font-black tracking-tighter italic uppercase leading-none">DOMBASTIS</h1>
+            <p class="text-[9px] text-dombaYellow/60 uppercase tracking-[0.35em] font-black mt-1">House of Sheep</p>
+        </div>
+
+        <!-- Nav -->
+        <nav class="flex-1 px-4 mt-4 space-y-0.5 overflow-y-auto custom-scroll pb-3">
+
+            <p class="px-4 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] py-2">Menu Utama</p>
+
+            <a href="{{ url_for('dashboard') }}"
+               class="nav-link {{ 'active' if request.endpoint == 'dashboard' }}">
+                <i class="fas fa-chart-pie"></i><span>Dashboard</span>
+            </a>
+
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('list_penjualan') }}"
+               class="nav-link nav-jual {{ 'active' if request.endpoint in ['list_penjualan','struk_penjualan','tambah_penjualan'] }}">
+                <i class="fas fa-store-alt"></i>
+                <span>Penjualan Domba</span>
+                <span class="ml-auto text-[8px] font-black px-1.5 py-0.5 rounded-md bg-dombaYellow/20 text-dombaYellow leading-none">ADMIN</span>
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('tugas') }}"
+               class="nav-link {{ 'active' if request.endpoint in ['tugas','laporan_tugas'] }}">
+                <i class="fas fa-tasks"></i><span>Laporan Tugas</span>
+            </a>
+
+            <a href="{{ url_for('list_rekam_medis') }}"
+               class="nav-link {{ 'active' if request.endpoint == 'list_rekam_medis' }}">
+                <i class="fas fa-file-medical"></i><span>Rekam Medis</span>
+            </a>
+
+            <a href="{{ url_for('list_sop') }}"
+               class="nav-link {{ 'active' if request.endpoint in ['list_sop','tambah_sop','edit_sop'] }}">
+                <i class="fas fa-calendar-alt"></i><span>Jadwal & SOP</span>
+            </a>
+
+            {% if session.get('role') == 'admin' %}
+            <div class="pt-4">
+                <p class="px-4 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] py-2">Administrator</p>
+
+                <a href="{{ url_for('tambah_ternak') }}"
+                   class="nav-link {{ 'active' if request.endpoint == 'tambah_ternak' }}">
+                    <i class="fas fa-plus-circle"></i><span>Input Ternak</span>
+                </a>
+
+                <a href="{{ url_for('list_keuangan_kas') }}"
+                   class="nav-link {{ 'active' if request.endpoint in ['list_keuangan_kas','list_keuangan','tambah_keuangan','detail_keuangan'] }}">
+                    <i class="fas fa-wallet"></i><span>Keuangan & Kas</span>
+                </a>
+
+                <a href="{{ url_for('list_keuangan_invoice') }}"
+                   class="nav-link {{ 'active' if request.endpoint in ['list_keuangan_invoice','struk_invoice'] }}">
+                    <i class="fas fa-file-invoice-dollar"></i><span>Invoice</span>
+                </a>
+
+                <a href="{{ url_for('list_users') }}"
+                   class="nav-link {{ 'active' if request.endpoint in ['list_users','register'] }}">
+                    <i class="fas fa-users-cog"></i><span>Kelola Karyawan</span>
+                </a>
+            </div>
+            {% endif %}
+
+        </nav>
+
+        <!-- Footer sidebar -->
+        <div class="p-4 border-t border-white/5 bg-black/20 space-y-2">
+
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('list_penjualan') }}"
+               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all btn-shine
+                      {{ 'bg-dombaYellow text-dombaGreen' if request.endpoint in ['list_penjualan','struk_penjualan'] else 'bg-dombaYellow/15 text-dombaYellow border border-dombaYellow/20 hover:bg-dombaYellow hover:text-dombaGreen' }}">
+                <i class="fas fa-receipt text-sm"></i> Cetak Struk Penjualan
+            </a>
+            {% endif %}
+
+            <div class="flex items-center gap-3 bg-white/5 p-3 rounded-2xl">
+                <div class="w-9 h-9 rounded-xl bg-dombaYellow flex items-center justify-center text-dombaGreen font-black text-sm uppercase flex-shrink-0">
+                    {{ session['username'][0] if session.get('username') else 'U' }}
+                </div>
+                <div class="overflow-hidden flex-1">
+                    <p class="text-xs font-black uppercase truncate leading-tight">{{ session.get('username','-') }}</p>
+                    <p class="text-[9px] text-dombaYellow flex items-center gap-1 font-bold">
+                        <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                        {{ session.get('role','user') | upper }}
+                    </p>
+                </div>
+            </div>
+
+            <a href="{{ url_for('logout') }}"
+               class="flex items-center justify-center w-full py-2.5 bg-red-500/10 hover:bg-red-500
+                      text-red-400 hover:text-white text-[10px] font-black uppercase rounded-2xl
+                      transition-all tracking-widest gap-2">
+                <i class="fas fa-power-off"></i> Logout System
+            </a>
+        </div>
+
+    </aside>
+    <!-- ==================== END SIDEBAR ==================== -->
+
+
+    <!-- ==================== KONTEN UTAMA ==================== -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+
+        <!-- Header -->
+        <header class="bg-white/90 backdrop-blur-md h-16 border-b border-gray-100 flex items-center justify-between px-5 md:px-8 sticky top-0 z-10 no-print flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="lg:hidden w-9 h-9 bg-dombaGreen rounded-xl flex items-center justify-center text-dombaYellow">
+                    <i class="fas fa-sheep text-sm"></i>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse hidden lg:block"></span>
+                    <span class="text-[11px] font-black text-dombaGreen uppercase tracking-[0.2em]">🐑 Smart Farming System</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden md:block">
+                    <p id="clock" class="text-sm font-black text-dombaGreen leading-none"></p>
+                    <p id="tanggal" class="text-[9px] font-bold text-gray-400 uppercase mt-0.5 tracking-widest"></p>
+                </div>
+                <a href="{{ url_for('logout') }}"
+                   class="lg:hidden w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center text-red-400 border border-red-100">
+                    <i class="fas fa-power-off text-xs"></i>
+                </a>
+            </div>
+        </header>
+
+        <!-- Area konten -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-28">
+
+            <!-- Kop cetak -->
+            <div class="print-only-header">
+                <h1 style="font-size:22pt;font-weight:900;color:#0f4c3a;margin:0 0 4px;">DOMBASTIS FARM</h1>
+                <p style="font-size:9pt;color:#555;text-transform:uppercase;letter-spacing:3px;font-weight:700;">Laporan Operasional & Kesehatan Ternak</p>
+                <p style="font-size:7pt;color:#999;margin-top:6px;">Dicetak: <span id="print-date"></span></p>
+            </div>
+
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="mb-5 p-4 rounded-2xl text-white font-bold text-sm shadow-lg flex items-center gap-3 no-print animate__animated animate__fadeInDown
+                                {{ 'bg-green-600' if category == 'success' else ('bg-yellow-500' if category == 'warning' else 'bg-red-600') }}">
+                        <i class="fas {{ 'fa-check-circle' if category == 'success' else ('fa-exclamation-triangle' if category == 'warning' else 'fa-exclamation-circle') }} text-xl flex-shrink-0"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- Bottom nav mobile -->
+        <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-3 py-2
+                    flex justify-around items-center z-50 shadow-[0_-8px_24px_rgba(0,0,0,0.06)]
+                    rounded-t-[22px] no-print">
+            <a href="{{ url_for('dashboard') }}"
+               class="flex flex-col items-center gap-0.5 {{ 'text-dombaGreen' if request.endpoint == 'dashboard' else 'text-gray-300' }}">
+                <i class="fas fa-home text-lg"></i><span class="text-[8px] font-black uppercase">Home</span>
+            </a>
+            <a href="{{ url_for('tugas') }}"
+               class="flex flex-col items-center gap-0.5 {{ 'text-dombaGreen' if request.endpoint == 'tugas' else 'text-gray-300' }}">
+                <i class="fas fa-tasks text-lg"></i><span class="text-[8px] font-black uppercase">Tugas</span>
+            </a>
+            <div class="-mt-8">
+                <a href="{{ url_for('tambah_ternak') if session.get('role') == 'admin' else url_for('list_sop') }}"
+                   class="w-14 h-14 bg-dombaGreen rounded-2xl flex items-center justify-center text-dombaYellow shadow-xl border-4 border-dombaLight">
+                    <i class="fas fa-plus text-xl"></i>
+                </a>
+            </div>
+            <a href="{{ url_for('list_rekam_medis') }}"
+               class="flex flex-col items-center gap-0.5 {{ 'text-dombaGreen' if request.endpoint == 'list_rekam_medis' else 'text-gray-300' }}">
+                <i class="fas fa-file-medical text-lg"></i><span class="text-[8px] font-black uppercase">Medis</span>
+            </a>
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('list_penjualan') }}"
+               class="flex flex-col items-center gap-0.5 {{ 'text-dombaGreen' if request.endpoint == 'list_penjualan' else 'text-gray-300' }}">
+                <i class="fas fa-store text-lg"></i><span class="text-[8px] font-black uppercase">Jual</span>
+            </a>
+            {% else %}
+            <a href="{{ url_for('list_sop') }}"
+               class="flex flex-col items-center gap-0.5 {{ 'text-dombaGreen' if request.endpoint == 'list_sop' else 'text-gray-300' }}">
+                <i class="fas fa-calendar-check text-lg"></i><span class="text-[8px] font-black uppercase">SOP</span>
+            </a>
+            {% endif %}
+        </div>
+
+    </main>
+    <!-- ==================== END KONTEN UTAMA ==================== -->
+
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 700, once: true, easing: 'ease-out-back' });
+
+    function updateClock() {
+        const now = new Date();
+        const el = document.getElementById('clock');
+        const tgl = document.getElementById('tanggal');
+        const pd = document.getElementById('print-date');
+        if (el) el.innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) + ' WIB';
+        if (tgl) tgl.innerText = now.toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+        if (pd) pd.innerText = now.toLocaleString('id-ID');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Auto dismiss flash
+    setTimeout(() => {
+        document.querySelectorAll('.animate__fadeInDown').forEach(el => {
+            el.classList.replace('animate__fadeInDown','animate__fadeOut');
+            setTimeout(() => el.remove(), 600);
+        });
+    }, 3500);
+
+    if (window.location.search.includes('print=true')) window.print();
+</script>
+</body>
+</html>

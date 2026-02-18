@@ -1,0 +1,159 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<!-- HEADER -->
+<div class="flex items-center gap-4 mb-6">
+    <a href="{{ url_for('list_sop') }}"
+       class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-2xl flex items-center justify-center transition-all shrink-0">
+        <i class="fas fa-arrow-left text-gray-500"></i>
+    </a>
+    <div>
+        <h1 class="text-2xl font-black text-dombaGreen uppercase tracking-tight">Edit SOP</h1>
+        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-0.5">
+            Ubah jadwal & instruksi kerja kandang
+        </p>
+    </div>
+</div>
+
+<!-- FORM EDIT SOP -->
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-[28px] shadow-sm border border-gray-100 overflow-hidden">
+
+        <!-- Header Form -->
+        <div class="bg-dombaGreen px-7 py-6 relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-white font-black text-lg uppercase tracking-tight">
+                    <i class="fas fa-edit mr-2 text-dombaYellow"></i>
+                    Edit Jadwal SOP
+                </h2>
+                <p class="text-green-300 text-xs font-bold mt-1">ID: #{{ sop[0] }} — Perubahan akan langsung aktif</p>
+            </div>
+            <i class="fas fa-clipboard-list absolute -right-3 -bottom-3 text-8xl opacity-10 text-white"></i>
+        </div>
+
+        <!-- Body Form -->
+        <form action="{{ url_for('edit_sop', id=sop[0]) }}" method="POST" class="p-7 space-y-5">
+
+            <!-- Nama Kegiatan -->
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-tasks text-dombaYellow"></i> Nama Kegiatan
+                </label>
+                <input type="text" name="kegiatan"
+                    value="{{ sop[1] }}"
+                    required
+                    placeholder="Contoh: Pemberian Pakan Pagi"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl font-bold text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-dombaYellow/50 focus:border-dombaGreen transition-all">
+                <p class="text-[10px] text-gray-400 font-bold">Nama singkat yang mudah diingat karyawan</p>
+            </div>
+
+            <!-- Waktu Pelaksanaan -->
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-clock text-dombaYellow"></i> Waktu Pelaksanaan
+                </label>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" name="waktu"
+                        value="{{ sop[2] }}"
+                        placeholder="Contoh: 06:30 - 09:00"
+                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl font-bold text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-dombaYellow/50 focus:border-dombaGreen transition-all">
+                    <!-- Quick set buttons -->
+                    <div class="flex flex-wrap gap-1.5 items-center">
+                        <span class="text-[9px] font-black text-gray-400 uppercase w-full">Set Cepat:</span>
+                        <button type="button" onclick="setWaktu('06:30 - 09:00')"
+                            class="text-[9px] font-black px-2 py-1 bg-dombaGreen/10 text-dombaGreen rounded-lg hover:bg-dombaGreen hover:text-white transition-all">06:30</button>
+                        <button type="button" onclick="setWaktu('09:00 - 11:00')"
+                            class="text-[9px] font-black px-2 py-1 bg-dombaGreen/10 text-dombaGreen rounded-lg hover:bg-dombaGreen hover:text-white transition-all">09:00</button>
+                        <button type="button" onclick="setWaktu('13:00 - 15:00')"
+                            class="text-[9px] font-black px-2 py-1 bg-dombaGreen/10 text-dombaGreen rounded-lg hover:bg-dombaGreen hover:text-white transition-all">13:00</button>
+                        <button type="button" onclick="setWaktu('15:30 - 17:00')"
+                            class="text-[9px] font-black px-2 py-1 bg-dombaGreen/10 text-dombaGreen rounded-lg hover:bg-dombaGreen hover:text-white transition-all">15:30</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Takaran -->
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-weight text-dombaYellow"></i> Takaran / Dosis
+                    <span class="text-gray-300 font-normal normal-case text-[9px]">(opsional)</span>
+                </label>
+                <input type="text" name="takaran"
+                    value="{{ sop[3] }}"
+                    placeholder="Contoh: 2 kg per ekor, atau - jika tidak ada"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl font-bold text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-dombaYellow/50 focus:border-dombaGreen transition-all">
+            </div>
+
+            <!-- Instruksi Lengkap -->
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-list-ol text-dombaYellow"></i> Instruksi Lengkap
+                </label>
+                <textarea name="instruksi" rows="5"
+                    required
+                    placeholder="Tulis langkah-langkah kerja secara detail...&#10;Contoh:&#10;1. Siapkan pakan di ember&#10;2. Masuk ke kandang barat&#10;3. Bagi rata ke semua kamar"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl font-bold text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-dombaYellow/50 focus:border-dombaGreen transition-all resize-none leading-relaxed">{{ sop[5] }}</textarea>
+                <p class="text-[10px] text-gray-400 font-bold">Jelaskan langkah-langkah yang harus dilakukan karyawan</p>
+            </div>
+
+            <!-- Penanggung Jawab -->
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-user-check text-dombaYellow"></i> Penanggung Jawab
+                </label>
+                <div class="relative">
+                    <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                    <input type="text" name="penanggung_jawab"
+                        value="{{ sop[4] }}"
+                        required
+                        placeholder="Nama karyawan / SEMUA KARYAWAN"
+                        class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl font-bold text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-dombaYellow/50 focus:border-dombaGreen transition-all">
+                </div>
+                <div class="flex flex-wrap gap-1.5 mt-1">
+                    <span class="text-[9px] font-black text-gray-400 uppercase">Quick fill:</span>
+                    <button type="button" onclick="setPJ('SEMUA KARYAWAN')"
+                        class="text-[9px] font-black px-2 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-dombaGreen hover:text-white transition-all">Semua</button>
+                    <button type="button" onclick="setPJ('ANDIK')"
+                        class="text-[9px] font-black px-2 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-dombaGreen hover:text-white transition-all">Andik</button>
+                    <button type="button" onclick="setPJ('ADMIN')"
+                        class="text-[9px] font-black px-2 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-dombaGreen hover:text-white transition-all">Admin</button>
+                </div>
+            </div>
+
+            <!-- Preview Data Sebelumnya -->
+            <div class="bg-dombaYellow/10 border border-dombaYellow/30 rounded-2xl p-4">
+                <p class="text-[10px] font-black text-yellow-700 uppercase tracking-widest mb-2">
+                    <i class="fas fa-info-circle mr-1"></i> Data Sebelumnya
+                </p>
+                <div class="text-xs space-y-1 text-gray-600">
+                    <p><span class="font-black text-gray-500">Kegiatan:</span> {{ sop[1] }}</p>
+                    <p><span class="font-black text-gray-500">Waktu:</span> {{ sop[2] }}</p>
+                    <p><span class="font-black text-gray-500">PJ:</span> {{ sop[4] }}</p>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <div class="flex gap-3 pt-2">
+                <a href="{{ url_for('list_sop') }}"
+                    class="flex-1 py-4 border-2 border-gray-200 text-gray-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-gray-50 transition-all text-center">
+                    <i class="fas fa-times mr-1"></i> Batal
+                </a>
+                <button type="submit"
+                    class="flex-[2] py-4 bg-dombaGreen text-dombaYellow font-black uppercase text-xs tracking-widest rounded-2xl shadow-lg hover:bg-dombaDark transition-all btn-shine">
+                    <i class="fas fa-save mr-2"></i> Simpan Perubahan
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+function setWaktu(val) {
+    document.querySelector('input[name="waktu"]').value = val;
+}
+function setPJ(val) {
+    document.querySelector('input[name="penanggung_jawab"]').value = val;
+}
+</script>
+{% endblock %}

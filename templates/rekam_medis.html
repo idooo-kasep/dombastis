@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-2 md:px-0">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <span class="px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black rounded-full uppercase tracking-[0.2em] border border-red-200">Health Monitor</span>
+            </div>
+            <h2 class="text-4xl font-black text-dombaGreen italic uppercase tracking-tighter leading-none">Rekam Medis</h2>
+            <p class="text-gray-400 text-sm font-medium mt-1">Log kesehatan dan pengobatan ternak harian.</p>
+        </div>
+
+        <div class="flex flex-wrap gap-3 w-full md:w-auto">
+            <a href="{{ url_for('list_obat') }}"
+               class="flex-1 md:flex-none bg-white text-dombaGreen border-2 border-gray-100 font-black px-6 py-4 rounded-2xl shadow-sm hover:border-dombaGreen transition flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest">
+                <i class="fas fa-pills text-dombaYellow"></i>
+                <span>Katalog Obat</span>
+            </a>
+            <button onclick="document.getElementById('modalMedis').classList.remove('hidden')"
+                    class="flex-1 md:flex-none bg-dombaYellow text-dombaGreen font-black px-6 py-4 rounded-2xl shadow-xl shadow-dombaYellow/20 hover:bg-yellow-400 hover:scale-105 transition transform flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest">
+                <i class="fas fa-plus-circle"></i>
+                <span>Tambah Catatan</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+            <h3 class="font-black text-dombaGreen text-sm uppercase tracking-widest italic">Riwayat Klinis Ternak</h3>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Live Records</span>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto no-scrollbar">
+            <table class="w-full text-left min-w-[700px]">
+                <thead class="bg-white text-[10px] uppercase text-gray-400 font-black tracking-[0.2em] border-b border-gray-50">
+                    <tr>
+                        <th class="px-8 py-5">Tanggal</th>
+                        <th class="px-8 py-5">Identitas Domba</th>
+                        <th class="px-8 py-5">Diagnosa</th>
+                        <th class="px-8 py-5">Obat/Tindakan</th>
+                        <th class="px-8 py-5">Catatan</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm divide-y divide-gray-50">
+                    {% for m in medis_list %}
+                    <tr class="hover:bg-gray-50/80 transition group">
+                        <td class="px-8 py-6 font-mono text-dombaGreen italic text-xs">{{ m[2] }}</td>
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-dombaLight flex items-center justify-center text-dombaGreen border border-gray-100 font-black text-xs shadow-inner">
+                                    <i class="fas fa-tag opacity-30 text-[10px] mr-1"></i>{{ m[1] }}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <span class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wide border border-red-100 shadow-sm">
+                                {{ m[3] }}
+                            </span>
+                        </td>
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-2 text-gray-700 font-bold">
+                                <div class="w-7 h-7 bg-dombaYellow/10 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-pills text-dombaYellow text-xs"></i>
+                                </div>
+                                <span class="text-xs uppercase tracking-tight">{{ m[4] }}</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <p class="text-xs text-gray-400 italic leading-relaxed max-w-[200px] truncate group-hover:whitespace-normal group-hover:overflow-visible transition-all">
+                                {{ m[5] if m[5] else 'Tidak ada instruksi tambahan.' }}
+                            </p>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="py-24 text-center">
+                            <div class="flex flex-col items-center gap-3 opacity-20">
+                                <i class="fas fa-notes-medical text-7xl text-dombaGreen mb-2"></i>
+                                <p class="font-black uppercase tracking-[0.3em] text-sm italic">Belum ada riwayat medis</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalMedis" class="fixed inset-0 bg-dombaGreen/90 backdrop-blur-md z-[100] flex items-center justify-center hidden p-4">
+    <div class="bg-white w-full max-w-lg rounded-[45px] p-8 md:p-12 shadow-2xl relative animate-in fade-in zoom-in duration-300">
+        <button onclick="document.getElementById('modalMedis').classList.add('hidden')"
+                class="absolute top-8 right-8 w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all">
+            <i class="fas fa-times text-lg"></i>
+        </button>
+
+        <div class="mb-10">
+            <h3 class="text-3xl font-black text-dombaGreen italic uppercase tracking-tighter leading-none">Input Medis</h3>
+            <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mt-2">Dombastis Health Management</p>
+        </div>
+
+        <form action="{{ url_for('tambah_medis') }}" method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Identitas Domba</label>
+                    <select name="id_domba" required
+                            class="w-full bg-gray-50 border-2 border-transparent rounded-[20px] p-4 font-bold text-dombaGreen outline-none focus:border-dombaYellow focus:bg-white transition-all cursor-pointer appearance-none shadow-sm">
+                        <option value="" disabled selected>Pilih...</option>
+                        {% for d in domba_list %}
+                        <option value="{{ d[0] }}">{{ d[1] }} (ID: {{ d[0] }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Tgl Pemeriksaan</label>
+                    <input type="date" name="tanggal" required
+                           class="w-full bg-gray-50 border-2 border-transparent rounded-[20px] p-4 font-bold text-dombaGreen outline-none focus:border-dombaYellow focus:bg-white transition-all shadow-sm">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Diagnosa / Gejala</label>
+                <input type="text" name="diagnosa" placeholder="Misal: Kurang Nafsu Makan / Kembung" required
+                       class="w-full bg-gray-50 border-2 border-transparent rounded-[20px] p-4 font-bold text-dombaGreen outline-none focus:border-dombaYellow focus:bg-white transition-all shadow-sm">
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center px-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Obat / Vitamin</label>
+                    <a href="{{ url_for('list_obat') }}" target="_blank" class="text-[9px] font-black text-blue-500 hover:text-blue-700 uppercase tracking-tighter">
+                        <i class="fas fa-search-plus mr-1"></i> Katalog Obat
+                    </a>
+                </div>
+                <input type="text" name="obat" placeholder="Misal: B-Complex 2ml / Gusanex" required
+                       class="w-full bg-gray-50 border-2 border-transparent rounded-[20px] p-4 font-bold text-dombaGreen outline-none focus:border-dombaYellow focus:bg-white transition-all shadow-sm">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Catatan Perawat</label>
+                <textarea name="catatan" rows="3" placeholder="Instruksi tambahan bagi penjaga kandang..."
+                          class="w-full bg-gray-50 border-2 border-transparent rounded-[20px] p-4 font-bold text-dombaGreen outline-none focus:border-dombaYellow focus:bg-white transition-all shadow-sm"></textarea>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-dombaGreen text-white font-black py-5 rounded-[25px] shadow-2xl shadow-dombaGreen/30 hover:bg-dombaDark hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-[0.3em] text-xs">
+                Simpan Rekam Medis
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    window.onclick = function(event) {
+        const modal = document.getElementById('modalMedis');
+        if (event.target == modal) {
+            modal.classList.add('hidden');
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,281 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 space-y-8">
+
+    <!-- PAGE HEADER -->
+    <div data-aos="fade-down" class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-3xl font-black italic text-[#2D5A27] tracking-tighter uppercase">Katalog Obat</h2>
+            <p class="text-xs text-gray-400 font-semibold mt-1 uppercase tracking-widest">Referensi obat, gejala & dosis untuk ternak domba</p>
+        </div>
+        <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-2xl">
+            <span class="text-yellow-500 text-lg">💊</span>
+            <span class="text-[10px] font-black text-yellow-700 uppercase tracking-widest">9 Obat Referensi Tersedia</span>
+        </div>
+    </div>
+
+    <!-- SEARCH & FILTER -->
+    <div data-aos="fade-up" class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+        <div class="flex flex-col md:flex-row gap-4">
+            <div class="relative flex-1">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Cari nama obat atau gejala..."
+                    oninput="renderGrid()"
+                    class="w-full pl-10 pr-4 py-3 rounded-2xl border border-gray-100 bg-gray-50 text-sm font-semibold text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]/20 focus:border-[#2D5A27]"
+                />
+            </div>
+            <div class="flex gap-2 flex-wrap">
+                <button onclick="setFilter('semua', this)" class="filter-btn active-filter px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Semua</button>
+                <button onclick="setFilter('antiparasit', this)" class="filter-btn px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Antiparasit</button>
+                <button onclick="setFilter('antibiotik', this)" class="filter-btn px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Antibiotik</button>
+                <button onclick="setFilter('vitamin', this)" class="filter-btn px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Vitamin</button>
+                <button onclick="setFilter('stamina', this)" class="filter-btn px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Stamina</button>
+                <button onclick="setFilter('lainnya', this)" class="filter-btn px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Lainnya</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DRUG GRID -->
+    <div id="drugGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+    <div id="emptyState" class="hidden text-center py-20">
+        <div class="text-5xl mb-4">🔍</div>
+        <p class="text-gray-400 font-bold uppercase tracking-widest text-sm">Tidak ada obat ditemukan</p>
+    </div>
+
+    <!-- OBAT DARI DATABASE -->
+    {% if obat_list %}
+    <div data-aos="fade-up" class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+            <div>
+                <h3 class="font-black text-[#2D5A27] text-lg uppercase italic tracking-tighter">Obat Tambahan (Database)</h3>
+                <p class="text-xs text-gray-400 mt-1">Data obat yang ditambahkan oleh admin</p>
+            </div>
+            {% if session['role'] == 'admin' %}
+            <a href="{{ url_for('tambah_obat') }}" class="btn-shine bg-[#2D5A27] text-white text-[10px] font-bold px-4 py-3 rounded-2xl hover:bg-[#1a3a18] transition shadow-lg shadow-[#2D5A27]/20">
+                + Tambah Obat
+            </a>
+            {% endif %}
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[10px] uppercase text-gray-500 font-bold tracking-widest">
+                    <tr>
+                        <th class="px-6 py-4">Nama Obat</th>
+                        <th class="px-6 py-4">Brand</th>
+                        <th class="px-6 py-4">Fungsi</th>
+                        {% if session['role'] == 'admin' %}
+                        <th class="px-6 py-4 text-center">Opsi</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50 text-sm">
+                    {% for o in obat_list %}
+                    <tr class="hover:bg-gray-50/50 transition">
+                        <td class="px-6 py-4 font-black text-[#2D5A27] uppercase italic">{{ o[1] }}</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold">{{ o[2] }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-xs text-gray-600 max-w-xs">{{ o[3] }}</td>
+                        {% if session['role'] == 'admin' %}
+                        <td class="px-6 py-4 text-center">
+                            <a href="{{ url_for('hapus_obat', id=o[0]) }}"
+                               onclick="return confirm('Hapus obat ini?')"
+                               class="w-8 h-8 rounded-xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition mx-auto">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+        {% if session['role'] == 'admin' %}
+        <div class="flex justify-end" data-aos="fade-up">
+            <a href="{{ url_for('tambah_obat') }}" class="btn-shine bg-[#2D5A27] text-white text-[10px] font-bold px-5 py-3 rounded-2xl hover:bg-[#1a3a18] transition shadow-lg shadow-[#2D5A27]/20">
+                + Tambah Obat ke Database
+            </a>
+        </div>
+        {% endif %}
+    {% endif %}
+
+</div>
+
+<!-- MODAL DETAIL -->
+<div id="modalOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] hidden items-center justify-center" onclick="closeModalOutside(event)">
+    <div class="bg-white rounded-[32px] w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto shadow-2xl" id="modalBox">
+        <div class="bg-gradient-to-r from-[#2D5A27] to-[#1a3a18] rounded-t-[32px] p-6 relative">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <div id="modalBadges" class="flex items-center gap-2 mb-2"></div>
+                    <h2 id="modalName" class="text-2xl font-black italic text-white tracking-tight"></h2>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition flex-shrink-0 mt-1">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+        </div>
+        <div class="p-6 space-y-5">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-[#2D5A27] mb-3"><i class="fas fa-stethoscope mr-1"></i> Gejala / Indikasi</p>
+                <div id="modalSymptoms" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-[#2D5A27] mb-3"><i class="fas fa-capsules mr-1"></i> Fungsi & Kegunaan</p>
+                <p id="modalFunc" class="text-sm text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-2xl border border-gray-100"></p>
+            </div>
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-[#2D5A27] mb-3"><i class="fas fa-balance-scale mr-1"></i> Dosis Pemberian</p>
+                <div class="bg-[#2D5A27]/5 border-l-4 border-[#2D5A27] p-4 rounded-r-2xl">
+                    <p id="modalDose" class="text-sm font-bold text-[#2D5A27] leading-relaxed"></p>
+                </div>
+            </div>
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-2xl">
+                <p class="text-xs text-yellow-700 font-semibold leading-relaxed">⚠️ Selalu konsultasikan dengan dokter hewan sebelum pemberian obat. Ikuti dosis yang tertera dan pantau kondisi ternak setelah pemberian.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.filter-btn { background:#f8fafc; border:1.5px solid #e5e7eb; color:#6b7280; }
+.filter-btn:hover { border-color:#2D5A27; color:#2D5A27; }
+.active-filter { background:#2D5A27 !important; border-color:#2D5A27 !important; color:white !important; }
+.drug-card { animation: fadeInUp 0.4s ease both; }
+@keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+</style>
+
+<script>
+const drugs = [
+    { id:1, name:"WORMECTIN", category:"antiparasit", icon:"🦠", badge:"ANTIPARASIT",
+      symptoms:["Kutu","Caplak","Tungau","Insekta parasit","Penyakit cacing","Gatal berlebihan","Kurus/kering"],
+      func:"Mengobati penyakit yang disebabkan oleh parasit luar (kutu, caplak, tungau dan insekta lainnya). Mengobati penyakit cacing yang menyerang ternak.",
+      dose:"0,5 ml tiap 25 kg berat badan. Pemberian obat cukup 1 kali dan dapat diulang setiap 2 minggu atau sesuai kebutuhan." },
+    { id:2, name:"MEDOXY LA", category:"antibiotik", icon:"💉", badge:"ANTIBIOTIK",
+      symptoms:["Mastitis","Enteritis bacterial","Pneumonia","Radang pusar","Radang sendi","Radang kaki","Demam tinggi","Sesak napas"],
+      func:"Mengobati Mastitis (radang kelenjar susu), Enteritis bacterial (infeksi usus bakteri), Pneumonia (infeksi paru-paru), Radang pusar pada anak domba, Radang sendi dan kaki.",
+      dose:"1 ml per 10 kilogram berat badan. Penyuntikan cukup dilakukan 1 kali. Pada kasus yang kronis, ulangi penyuntikan setelah 3 hari." },
+    { id:3, name:"PANTEX MULTIVITAMINS", category:"vitamin", icon:"🌿", badge:"VITAMIN",
+      symptoms:["Defisiensi vitamin","Gangguan pertumbuhan","Kelemahan anak ternak","Anemia neonatal","Gangguan penglihatan","Anoreksia","Rakhitis","Tremor otot"],
+      func:"Pencegahan dan pengobatan defisiensi vitamin pada hewan ternak. Mengatasi gangguan pertumbuhan, kelemahan pada hewan yang baru lahir, anemia neonatal, gangguan penglihatan, masalah pencernaan, pemulihan setelah sakit, anoreksia, rakhitis, kelemahan otot, dan tremor otot.",
+      dose:"2–5 ml per hewan. Dapat diulang setelah 3–5 hari." },
+    { id:4, name:"BIO ENERGY", category:"stamina", icon:"⚡", badge:"STAMINA",
+      symptoms:["Lemah pasca melahirkan","Kelelahan ekstrem","Pasca sakit","Pasca perjalanan jauh","Stamina menurun","Otot lemah"],
+      func:"Meningkatkan stamina tubuh. Menguatkan otot yang lemah setelah melahirkan, saat sakit, atau setelah perjalanan jauh.",
+      dose:"2–5 ml. Bisa diberikan 3–4 kali dengan jarak 2–5 hari per suntikan." },
+    { id:5, name:"COLIBACT", category:"antibiotik", icon:"🛡️", badge:"ANTIBIOTIK",
+      symptoms:["Infeksi saluran pernafasan","Infeksi pencernaan","Infeksi saluran kemih","Infeksi viral sekunder","Septicemia","Radang persendian","Foot rot","Mastitis"],
+      func:"Mengobati infeksi saluran pernafasan, infeksi saluran pencernaan, infeksi saluran kemih, infeksi sekunder pada penyakit viral, septicemia, radang persendian, foot rot, dan mastitis.",
+      dose:"1 ml per 16 kg berat badan. Bila dosis melebihi 5 ml per ekor, penyuntikan dianjurkan pada 2 sisi yang berbeda." },
+    { id:6, name:"B SANPLEX", category:"vitamin", icon:"🔋", badge:"VITAMIN B",
+      symptoms:["Defisiensi vitamin B","Gangguan metabolisme","Gangguan pencernaan non-bakteri","Pemulihan pasca sakit","Nafsu makan turun"],
+      func:"Mencegah dan mengobati defisiensi vitamin B kompleks. Memperbaiki metabolisme tubuh, gangguan pencernaan yang bukan diakibatkan bakteri, memperbaiki sistem pencernaan, serta digunakan dalam masa penyembuhan setelah sakit.",
+      dose:"1–2 ml per 40 kilogram berat badan." },
+    { id:7, name:"MEDIPIRON", category:"lainnya", icon:"🌡️", badge:"ANALGESIK",
+      symptoms:["Demam tinggi","Nyeri akut","Peradangan","Rasa sakit","Panas tubuh"],
+      func:"Berfungsi sebagai analgesik (pereda nyeri), antipiretik (penurun demam), dan antiinflamasi (pereduksi peradangan).",
+      dose:"5–10 ml per 30–60 kg berat badan." },
+    { id:8, name:"CALCIDEX PLUS", category:"lainnya", icon:"🦴", badge:"MINERAL",
+      symptoms:["Defisiensi kalsium","Defisiensi magnesium","Defisiensi phosphor","Milk fever","Grass tetany","Eclampsia","Acidosis","Lumpuh otot pre/post melahirkan"],
+      func:"Pencegahan dan pengobatan defisiensi kalsium, magnesium dan phosphor. Mengatasi milk fever, grass tetany, eclampsia dan acidosis, serta paralisa otot sebelum dan sesudah melahirkan.",
+      dose:"25–50 ml untuk ternak 50–100 kg BB." },
+    { id:9, name:"TYMPANOL", category:"lainnya", icon:"🫧", badge:"DIGESTIF",
+      symptoms:["Kembung akut","Perut buncit","Sesak napas akibat kembung","Gangguan rumen"],
+      func:"Untuk mengobati kembung akut (bloat) pada ternak. Bekerja dengan cepat untuk mengeluarkan gas berlebih di dalam rumen.",
+      dose:"Larutkan 25 ml TYMPANOL dalam 250 ml air minum, kemudian diminumkan atau dicekok kepada ternak." }
+];
+
+let currentFilter = 'semua';
+
+function setFilter(cat, el) {
+    currentFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
+    el.classList.add('active-filter');
+    renderGrid();
+}
+
+function renderGrid() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = drugs;
+    if (currentFilter !== 'semua') filtered = filtered.filter(d => d.category === currentFilter);
+    if (q) filtered = filtered.filter(d =>
+        d.name.toLowerCase().includes(q) ||
+        d.symptoms.some(s => s.toLowerCase().includes(q)) ||
+        d.func.toLowerCase().includes(q)
+    );
+
+    const grid = document.getElementById('drugGrid');
+    const empty = document.getElementById('emptyState');
+
+    if (!filtered.length) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+    }
+    empty.classList.add('hidden');
+
+    grid.innerHTML = filtered.map((d, i) => `
+        <div class="drug-card bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group"
+             style="animation-delay:${i*0.06}s" onclick="openModal(${d.id})">
+            <div class="bg-gradient-to-r from-[#2D5A27] to-[#1a3a18] p-5 flex items-start justify-between">
+                <div>
+                    <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-yellow-400 text-[#1a3a18] mb-2">${d.badge}</span>
+                    <h3 class="text-lg font-black italic text-white tracking-tight leading-tight">${d.name}</h3>
+                </div>
+                <span class="text-2xl">${d.icon}</span>
+            </div>
+            <div class="p-5">
+                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Indikasi Utama</p>
+                <div class="flex flex-wrap gap-1 mb-4">
+                    ${d.symptoms.slice(0,3).map(s=>`<span class="text-[10px] font-semibold bg-gray-50 border border-gray-100 text-gray-500 px-2 py-1 rounded-full">${s}</span>`).join('')}
+                    ${d.symptoms.length>3?`<span class="text-[10px] font-semibold bg-gray-50 border border-gray-100 text-gray-400 px-2 py-1 rounded-full">+${d.symptoms.length-3} lainnya</span>`:''}
+                </div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Dosis</p>
+                <p class="text-xs font-semibold text-[#2D5A27] leading-relaxed line-clamp-2">${d.dose}</p>
+            </div>
+            <div class="px-5 pb-5">
+                <div class="w-full py-2.5 bg-[#2D5A27]/5 group-hover:bg-[#2D5A27] text-[#2D5A27] group-hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-center">
+                    Lihat Detail Lengkap →
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openModal(id) {
+    const d = drugs.find(x => x.id === id);
+    document.getElementById('modalName').textContent = d.name;
+    document.getElementById('modalBadges').innerHTML = `
+        <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-yellow-400 text-[#1a3a18]">${d.badge}</span>
+        <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-white/20 text-white">${d.icon} ${d.category}</span>`;
+    document.getElementById('modalFunc').textContent = d.func;
+    document.getElementById('modalDose').textContent = d.dose;
+    document.getElementById('modalSymptoms').innerHTML = d.symptoms.map(s=>
+        `<span class="text-[11px] font-semibold bg-gray-50 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-full">${s}</span>`
+    ).join('');
+
+    const overlay = document.getElementById('modalOverlay');
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('modalOverlay').classList.add('hidden');
+    document.getElementById('modalOverlay').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+
+function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+renderGrid();
+</script>
+{% endblock %}

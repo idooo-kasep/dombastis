@@ -1,0 +1,173 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 space-y-6">
+
+    <!-- HEADER - berbeda untuk admin vs karyawan -->
+    <div data-aos="fade-up" class="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-8 border-b border-gray-50 flex justify-between items-center
+                    {% if session['role'] == 'admin' %} bg-[#2D5A27] {% else %} bg-gradient-to-r from-[#2D5A27] to-[#3a7a30] {% endif %}">
+            <div>
+                {% if session['role'] == 'admin' %}
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-yellow-400 text-[#1a3a18] text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Admin View</span>
+                        <span class="text-white/50 text-[10px]">Semua Karyawan</span>
+                    </div>
+                    <h3 class="font-black text-white text-xl uppercase italic tracking-tighter">Laporan Tugas (Check Log)</h3>
+                    <p class="text-xs text-yellow-400 font-bold uppercase tracking-widest mt-1">Monitoring Kinerja Harian Seluruh Karyawan</p>
+                {% else %}
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-yellow-400 text-[#1a3a18] text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Laporan Saya</span>
+                        <span class="text-white/50 text-[10px]">{{ session['username'] }}</span>
+                    </div>
+                    <h3 class="font-black text-white text-xl uppercase italic tracking-tighter">Riwayat Tugas Saya</h3>
+                    <p class="text-xs text-yellow-400 font-bold uppercase tracking-widest mt-1">Rekap Aktivitas Harian Anda</p>
+                {% endif %}
+            </div>
+            <div class="bg-white/10 p-3 rounded-2xl">
+                <i class="fas fa-clipboard-check text-white text-2xl"></i>
+            </div>
+        </div>
+
+        <!-- RINGKASAN STATISTIK -->
+        {% if logs %}
+        <div class="grid grid-cols-2 {% if session['role'] == 'admin' %}md:grid-cols-4{% else %}md:grid-cols-3{% endif %} divide-x divide-gray-100 border-b border-gray-100">
+
+            <div class="p-5 text-center">
+                <p class="text-2xl font-black text-[#2D5A27]">{{ logs | length }}</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Total Laporan</p>
+            </div>
+
+            <div class="p-5 text-center">
+                <p class="text-2xl font-black text-yellow-500">
+                    {{ logs | selectattr(3, 'equalto', 'Barat') | list | length }}
+                </p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Kandang Barat</p>
+            </div>
+
+            <div class="p-5 text-center">
+                <p class="text-2xl font-black text-blue-500">
+                    {{ logs | selectattr(3, 'equalto', 'Timur') | list | length }}
+                </p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Kandang Timur</p>
+            </div>
+
+            {% if session['role'] == 'admin' %}
+            <div class="p-5 text-center">
+                <p class="text-2xl font-black text-green-500">
+                    {{ logs | map(attribute=1) | unique | list | length }}
+                </p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Karyawan Aktif</p>
+            </div>
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+        <!-- TABEL -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-[10px] uppercase text-gray-500 font-black tracking-widest">
+                    <tr>
+                        {% if session['role'] == 'admin' %}
+                        <th class="px-8 py-5">Karyawan</th>
+                        {% endif %}
+                        <th class="px-8 py-5">Lokasi Kandang</th>
+                        <th class="px-8 py-5">Aktivitas</th>
+                        <th class="px-8 py-5">Tanggal</th>
+                        <th class="px-8 py-5">Catatan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50 text-sm">
+                    {% for log in logs %}
+                    <tr class="hover:bg-gray-50/50 transition">
+
+                        <!-- Kolom Karyawan: hanya tampil untuk admin -->
+                        {% if session['role'] == 'admin' %}
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-[#2D5A27]/10 flex items-center justify-center
+                                            text-[#2D5A27] font-black text-xs">
+                                    {{ log[1][0].upper() if log[1] else '?' }}
+                                </div>
+                                <span class="font-black text-[#2D5A27] uppercase text-xs">{{ log[1] or '-' }}</span>
+                            </div>
+                        </td>
+                        {% endif %}
+
+                        <!-- Lokasi -->
+                        <td class="px-8 py-5">
+                            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider
+                                         {{ 'bg-yellow-100 text-yellow-700' if log[2] == 'Barat' else 'bg-blue-100 text-blue-700' }}">
+                                {{ log[2] }}
+                            </span>
+                        </td>
+
+                        <!-- Aktivitas -->
+                        <td class="px-8 py-5 text-gray-600 text-xs">
+                            <div class="flex flex-wrap gap-1">
+                                {% if log[4] %}<span class="bg-green-50 text-green-700 px-2 py-0.5 rounded-full text-[9px] font-bold">🌾 Buat Pakan</span>{% endif %}
+                                {% if log[5] %}<span class="bg-green-50 text-green-700 px-2 py-0.5 rounded-full text-[9px] font-bold">🍽️ Beri Pakan</span>{% endif %}
+                                {% if log[6] %}<span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-[9px] font-bold">🧹 Sapu Kandang</span>{% endif %}
+                                {% if log[7] %}<span class="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full text-[9px] font-bold">✂️ Cukur ({{ log[7] }})</span>{% endif %}
+                                {% if log[8] %}<span class="bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full text-[9px] font-bold">🧴 Disinfektan</span>{% endif %}
+                                {% if log[9] %}<span class="bg-cyan-50 text-cyan-700 px-2 py-0.5 rounded-full text-[9px] font-bold">💧 Bersih Tandon</span>{% endif %}
+                                {% if log[10] %}<span class="bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded-full text-[9px] font-bold">🧂 Cek Garam</span>{% endif %}
+                                {% if not log[4] and not log[5] and not log[6] and not log[7] and not log[8] and not log[9] and not log[10] %}
+                                    <span class="text-gray-300 text-[9px] italic">Tidak ada aktivitas</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <!-- Tanggal -->
+                        <td class="px-8 py-5 text-gray-400 text-xs font-bold whitespace-nowrap">{{ log[3] }}</td>
+
+                        <!-- Catatan -->
+                        <td class="px-8 py-5 text-gray-500 text-xs italic max-w-xs">
+                            {{ log[11] or '-' }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="{% if session['role'] == 'admin' %}5{% else %}4{% endif %}"
+                            class="px-8 py-20 text-center">
+                            <div class="opacity-10 mb-4">
+                                <i class="fas fa-history text-6xl text-[#2D5A27]"></i>
+                            </div>
+                            {% if session['role'] == 'admin' %}
+                                <p class="text-gray-400 italic font-medium">Belum ada aktivitas yang tercatat dari karyawan manapun.</p>
+                            {% else %}
+                                <p class="text-gray-400 italic font-medium">Anda belum memiliki laporan tugas.</p>
+                                <a href="{{ url_for('tugas') }}"
+                                   class="inline-block mt-4 bg-[#2D5A27] text-white text-[10px] font-black
+                                          uppercase tracking-widest px-5 py-3 rounded-2xl hover:bg-[#1a3a18] transition">
+                                    + Buat Laporan Tugas
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FOOTER: tombol aksi -->
+        {% if logs %}
+        <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                Menampilkan {{ logs | length }} laporan
+                {% if session['role'] != 'admin' %} milik Anda{% endif %}
+            </p>
+            {% if session['role'] != 'admin' %}
+            <a href="{{ url_for('tugas') }}"
+               class="btn-shine bg-[#2D5A27] text-white text-[10px] font-black uppercase tracking-widest
+                      px-5 py-3 rounded-2xl hover:bg-[#1a3a18] transition shadow-lg shadow-[#2D5A27]/20">
+                + Tambah Laporan
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

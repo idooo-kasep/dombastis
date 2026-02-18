@@ -1,0 +1,125 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h2 class="text-3xl font-black text-[#2D5A27] italic uppercase tracking-tighter">Manajemen Keuangan</h2>
+            <p class="text-gray-500 text-sm font-bold">Monitor transaksi dan sisa tagihan pelanggan.</p>
+        </div>
+        <div class="flex gap-2 w-full md:w-auto">
+            <button onclick="document.getElementById('modalKeuangan').classList.remove('hidden')"
+                    class="bg-[#2D5A27] text-white font-bold px-6 py-3 rounded-2xl shadow-lg hover:bg-[#1a3a18] transition flex items-center gap-2 flex-1 md:flex-none justify-center">
+                <i class="fas fa-file-invoice-dollar"></i> Buat Invoice
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-[10px] uppercase text-gray-400 font-bold border-b">
+                    <tr>
+                        <th class="px-6 py-4">Tgl / No Invoice</th>
+                        <th class="px-6 py-4">Pelanggan</th>
+                        <th class="px-6 py-4">Produk</th>
+                        <th class="px-6 py-4">Total Harga</th>
+                        <th class="px-6 py-4">Sisa Tagihan</th>
+                        <th class="px-6 py-4 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm divide-y">
+                    {% for t in transaksi %}
+                    <tr class="hover:bg-gray-50 transition group">
+                        <td class="px-6 py-4">
+                            <span class="block text-[10px] text-gray-400 font-bold">{{ t[8] }}</span>
+                            <span class="font-black text-[#2D5A27]">{{ t[1] }}</span>
+                        </td>
+                        <td class="px-6 py-4 font-bold uppercase text-gray-700">{{ t[2] }}</td>
+                        <td class="px-6 py-4 text-gray-500 italic">{{ t[3] }} ({{ t[4] }} Ekor)</td>
+                        <td class="px-6 py-4 font-black text-gray-800">Rp {{ "{:,.0f}".format(t[5]) }}</td>
+                        <td class="px-6 py-4">
+                            {% if t[7] > 0 %}
+                            <div class="bg-red-50 text-red-600 px-3 py-1 rounded-full text-[10px] font-black inline-block border border-red-100">
+                                BELUM LUNAS: Rp {{ "{:,.0f}".format(t[7]) }}
+                            </div>
+                            {% else %}
+                            <div class="bg-green-50 text-green-600 px-3 py-1 rounded-full text-[10px] font-black inline-block border border-green-100">
+                                LUNAS
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex justify-center items-center gap-2">
+                                <a href="{{ url_for('cetak_invoice', id=t[0]) }}"
+                                   class="bg-blue-50 text-blue-600 p-2 px-3 rounded-xl hover:bg-blue-600 hover:text-white transition font-bold text-[10px] flex items-center gap-1 shadow-sm" title="Cetak Invoice A4">
+                                    <i class="fas fa-print"></i> INV
+                                </a>
+                                <a href="{{ url_for('struk_invoice', id=t[0]) }}"
+                                   class="bg-orange-50 text-orange-600 p-2 px-3 rounded-xl hover:bg-orange-600 hover:text-white transition font-bold text-[10px] flex items-center gap-1 shadow-sm" title="Cetak Struk Kecil">
+                                    <i class="fas fa-receipt"></i> STRUK
+                                </a>
+                                <form action="{{ url_for('hapus_transaksi', id=t[0]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
+                                    <button type="submit" class="bg-red-50 text-red-400 p-2 rounded-xl hover:bg-red-500 hover:text-white transition shadow-sm">
+                                        <i class="fas fa-trash-alt text-[10px]"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-400 font-bold uppercase text-xs tracking-widest">
+                            <i class="fas fa-folder-open block text-3xl mb-2 opacity-20"></i>
+                            Belum ada transaksi tercatat.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Buat Invoice -->
+<div id="modalKeuangan" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white w-full max-w-lg rounded-[30px] p-8 relative shadow-2xl overflow-y-auto max-h-[90vh]">
+        <h3 class="text-xl font-black text-[#2D5A27] mb-6 uppercase italic">Input Transaksi Baru</h3>
+        <form action="{{ url_for('tambah_transaksi') }}" method="POST" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">No Invoice</label>
+                    <input type="text" name="no_invoice" placeholder="INV-001" class="w-full p-4 bg-gray-50 rounded-xl border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-[#2D5A27] outline-none font-bold" required>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Tanggal</label>
+                    <input type="date" name="tanggal" class="w-full p-4 bg-gray-50 rounded-xl border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-[#2D5A27] outline-none font-bold" required>
+                </div>
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Nama Pelanggan</label>
+                <input type="text" name="pelanggan" placeholder="Masukkan nama pelanggan" class="w-full p-4 bg-gray-50 rounded-xl border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-[#2D5A27] outline-none font-bold" required>
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Produk / Jenis Domba</label>
+                <input type="text" name="produk" placeholder="Contoh: Domba Merino" class="w-full p-4 bg-gray-50 rounded-xl border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-[#2D5A27] outline-none font-bold" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Jumlah (Ekor)</label>
+                    <input type="number" name="jumlah" placeholder="0" class="w-full p-4 bg-gray-50 rounded-xl border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-[#2D5A27] outline-none font-bold" required>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Total Harga (Rp)</label>
+                    <input type="number" name="total_harga" placeholder="0" class="w-full p-4 bg-gray-50 rounded-xl border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-[#2D5A27] outline-none font-bold" required>
+                </div>
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase text-red-400 ml-2 italic font-bold">Uang Muka (DP) / Dibayar Saat Ini</label>
+                <input type="number" name="terbayar" placeholder="0" class="w-full p-4 bg-red-50/50 rounded-xl border-0 ring-1 ring-red-100 focus:ring-2 focus:ring-[#2D5A27] outline-none font-black text-[#2D5A27]" required>
+            </div>
+            <button type="submit" class="w-full bg-[#2D5A27] text-white font-black py-5 rounded-2xl shadow-xl hover:bg-[#1a3a18] transition tracking-widest text-xs">SIMPAN & TERBITKAN INVOICE</button>
+            <button type="button" onclick="document.getElementById('modalKeuangan').classList.add('hidden')" class="w-full text-gray-400 font-bold text-[10px] uppercase mt-2">BATAL</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

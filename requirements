@@ -1,0 +1,6 @@
+flask
+flask-mysqldb
+fpdf
+werkzeug
+gunicorn
+mysqlclient

@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-black text-[#2D5A27] uppercase italic tracking-tighter">Manajemen Tim Kandang</h1>
+            <p class="text-gray-400 text-sm font-medium mt-1">Kelola akun karyawan sistem Dombastis</p>
+        </div>
+        <a href="{{ url_for('register') }}" class="bg-yellow-400 text-[#1a3a18] px-6 py-3 rounded-2xl font-black text-xs uppercase shadow-lg shadow-yellow-400/20 hover:scale-105 transition flex items-center gap-2">
+            <i class="fas fa-user-plus"></i> Tambah Karyawan Baru
+        </a>
+    </div>
+
+    <div class="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-50 bg-[#2D5A27]">
+            <h3 class="font-black text-white text-sm uppercase tracking-widest flex items-center gap-2">
+                <i class="fas fa-users-cog text-yellow-400"></i> Daftar Pengguna Aktif
+            </h3>
+        </div>
+        <table class="w-full text-left">
+            <thead class="bg-gray-50 text-[10px] uppercase text-gray-400 font-black tracking-widest">
+                <tr>
+                    <th class="px-8 py-4">Username</th>
+                    <th class="px-8 py-4">Jabatan (Role)</th>
+                    <th class="px-8 py-4 text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for user in users %}
+                <tr class="hover:bg-gray-50/50 transition">
+                    <td class="px-8 py-5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-[#2D5A27] flex items-center justify-center text-white font-black text-sm">
+                                {{ user[1][0].upper() }}
+                            </div>
+                            <span class="font-bold text-[#2D5A27] uppercase">{{ user[1] }}</span>
+                        </div>
+                    </td>
+                    <td class="px-8 py-5">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase {{ 'bg-yellow-100 text-yellow-700' if user[2] == 'admin' else 'bg-blue-100 text-blue-600' }}">
+                            {{ user[2] }}
+                        </span>
+                    </td>
+                    <td class="px-8 py-5 text-right">
+                        {% if user[0] != session['id'] %}
+                        <a href="{{ url_for('hapus_user', id=user[0]) }}" onclick="return confirm('Hapus akun {{ user[1] }}?')"
+                           class="bg-red-50 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition">
+                            <i class="fas fa-trash-alt mr-1"></i> Hapus
+                        </a>
+                        {% else %}
+                        <span class="text-[9px] text-gray-300 font-bold uppercase italic">Akun Aktif Anda</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

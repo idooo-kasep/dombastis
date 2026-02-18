@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-6 no-print-bg">
+    <div class="flex justify-between items-center mb-6 no-print">
+        <a href="{{ url_for('list_keuangan') }}" class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+        <button onclick="window.print()" class="bg-dombaGreen text-white px-5 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest shadow-lg">
+            <i class="fas fa-print mr-2"></i> Cetak Struk
+        </button>
+    </div>
+
+    <div class="bg-white p-4 shadow-sm border border-gray-100 mx-auto w-[300px] text-gray-800 font-mono" id="printable-struk">
+        
+        <div class="text-center border-b border-dashed border-gray-300 pb-4 mb-4">
+            <h1 class="text-xl font-black uppercase tracking-tighter">Dombastis</h1>
+            <p class="text-[10px] font-bold">Nglerep-Trayang, Ngronggot, Nganjuk</p>
+            <p class="text-[10px] font-bold">WA: 0877-8750-2950</p>
+        </div>
+
+        <div class="text-[11px] mb-4 space-y-1">
+            <div class="flex justify-between">
+                <span>No:</span>
+                <span class="font-bold">#{{ transaksi[0] }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Tgl:</span>
+                <span>{{ transaksi[1] }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Plgn:</span>
+                <span class="font-bold uppercase">{{ pelanggan_nama if pelanggan_nama else 'Umum' }}</span>
+            </div>
+        </div>
+
+        <div class="border-b border-dashed border-gray-300 mb-4">
+            <div class="flex justify-between text-[11px] font-black mb-2">
+                <span>Item</span>
+                <span>Total</span>
+            </div>
+            <div class="flex justify-between text-[11px] mb-2 leading-tight">
+                <span class="uppercase w-32">{{ transaksi[2] }}</span>
+                <span>{{ transaksi[3] }}</span>
+            </div>
+        </div>
+
+        <div class="text-[12px] space-y-1 mb-6">
+            <div class="flex justify-between font-black">
+                <span>TOTAL</span>
+                <span>Rp {{ transaksi[3] }}</span>
+            </div>
+            <div class="flex justify-between text-gray-500">
+                <span>Bayar</span>
+                <span>Rp {{ dibayar if dibayar else transaksi[3] }}</span>
+            </div>
+            {% if sisa and sisa != '0' %}
+            <div class="flex justify-between text-red-600 font-bold border-t border-dotted pt-1">
+                <span>SISA</span>
+                <span>Rp {{ sisa }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="text-center text-[10px] space-y-1 mt-4">
+            <p class="font-bold uppercase tracking-widest">Terima Kasih</p>
+            <p>Barang yang sudah dibeli</p>
+            <p>tidak dapat ditukar/dikembalikan</p>
+            <div class="mt-4 opacity-30 italic">--- Dombastis Farm ---</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Font Khusus Struk */
+    @font-face {
+        font-family: 'ReceiptFont';
+        src: url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+    }
+
+    #printable-struk {
+        font-family: 'Courier Prime', monospace;
+    }
+
+    @media print {
+        body * { visibility: hidden; background: white !important; }
+        #printable-struk, #printable-struk * { visibility: visible; }
+        #printable-struk {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%; /* Menyesuaikan lebar kertas printer thermal */
+            box-shadow: none !important;
+            border: none !important;
+            padding: 10px !important;
+        }
+        .no-print { display: none !important; }
+    }
+</style>
+{% endblock %}

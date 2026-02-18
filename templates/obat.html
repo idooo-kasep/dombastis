@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white rounded-[30px] shadow-xl overflow-hidden border border-gray-100">
+        <div class="bg-[#2D5A27] p-8 text-white flex justify-between items-center">
+            <div>
+                <h3 class="text-2xl font-black uppercase italic">Pojok Obat Wajib</h3>
+                <p class="text-yellow-400 text-xs font-bold uppercase tracking-widest">Panduan Pertolongan Pertama Dombastis</p>
+            </div>
+            <i class="fas fa-pills text-4xl opacity-20"></i>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for p in panduan %}
+        <div class="bg-white p-6 rounded-[25px] border border-gray-100 shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex-1">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Gejala Teramati</span>
+                    <h4 class="font-black text-red-600 text-base leading-tight">{{ p[1] }}</h4>
+                </div>
+                <div class="bg-green-100 px-3 py-1 rounded-full ml-2">
+                    <span class="text-[10px] font-bold text-[#2D5A27] italic">{{ p[2] }}</span>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-3">
+                <span class="text-[10px] font-black text-gray-400 uppercase">Kategori & Rekomendasi:</span>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="bg-[#2D5A27] text-white text-[10px] px-2 py-0.5 rounded font-bold uppercase">{{ p[3] }}</span>
+                    <p class="text-sm font-black text-gray-800 tracking-tight">{{ p[4] }}</p>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-dashed border-gray-100">
+                <p class="text-[9px] font-bold text-gray-400 uppercase mb-1">Status Ketersediaan:</p>
+                <div class="flex items-center text-green-600">
+                    <i class="fas fa-check-circle text-[10px] mr-1"></i>
+                    <span class="text-[10px] font-bold italic uppercase">Wajib Ada di Kotak Obat</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if obat_list %}
+    <div class="mt-10">
+        <h3 class="text-lg font-black text-[#2D5A27] uppercase italic mb-4 ml-2">Katalog Stok Lainnya</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {% for o in obat_list %}
+            <div class="bg-white/50 p-4 rounded-[20px] border border-gray-200 flex justify-between items-center">
+                <div>
+                    <p class="text-xs font-black text-gray-800">{{ o[1] }}</p>
+                    <p class="text-[9px] text-gray-500 font-bold uppercase">{{ o[2] }}</p>
+                </div>
+                <i class="fas fa-box text-gray-300"></i>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="p-6 bg-red-50 rounded-[30px] border border-red-100 flex items-center gap-6">
+        <div class="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
+            <i class="fas fa-exclamation-triangle text-xl"></i>
+        </div>
+        <div>
+            <p class="text-sm font-bold text-red-900 uppercase tracking-tighter">Instruksi Penting Admin:</p>
+            <p class="text-xs text-red-700 italic font-medium leading-relaxed">
+                Gunakan obat di atas sesuai dosis yang tertulis pada kemasan atau instruksi langsung Admin.
+                Pemisahan (Isolasi) domba sakit wajib dilakukan segera untuk mencegah penularan.
+                Segera lapor jika kondisi tidak membaik setelah 24 jam.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
