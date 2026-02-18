@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- =========================================================
+     HEADER HALAMAN
+========================================================= -->
+<div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-black text-dombaGreen uppercase tracking-tight flex items-center gap-3">
+            <span class="w-10 h-10 bg-dombaGreen rounded-2xl flex items-center justify-center text-dombaYellow shadow-lg">
+                <i class="fas fa-store-alt text-lg"></i>
+            </span>
+            Penjualan Domba
+        </h1>
+        <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1 ml-14">
+            Manajemen transaksi & cetak struk penjualan
+        </p>
+    </div>
+
+    <!-- Tombol Tambah Transaksi -->
+    <button onclick="document.getElementById('modalPenjualan').classList.remove('hidden')"
+        class="flex items-center gap-3 px-6 py-3 bg-dombaGreen text-dombaYellow font-black uppercase text-xs tracking-widest rounded-2xl shadow-lg hover:bg-dombaDark transition-all btn-shine">
+        <i class="fas fa-plus-circle text-base"></i>
+        Catat Penjualan Baru
+    </button>
+</div>
+
+<!-- =========================================================
+     KARTU STATISTIK
+========================================================= -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+    <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover-up">
+        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mb-3">
+            <i class="fas fa-sheep text-dombaGreen"></i>
+        </div>
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Terjual</p>
+        <p class="text-2xl font-black text-dombaGreen mt-1">{{ total_terjual or 0 }}<span class="text-sm font-bold text-gray-400 ml-1">Ekor</span></p>
+    </div>
+
+    <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover-up">
+        <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center mb-3">
+            <i class="fas fa-money-bill-wave text-yellow-600"></i>
+        </div>
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Pendapatan</p>
+        <p class="text-lg font-black text-dombaGreen mt-1">Rp {{ "{:,.0f}".format(total_pendapatan or 0) }}</p>
+    </div>
+
+    <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover-up">
+        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
+            <i class="fas fa-receipt text-blue-600"></i>
+        </div>
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Transaksi</p>
+        <p class="text-2xl font-black text-dombaGreen mt-1">{{ penjualan_list|length }}</p>
+    </div>
+
+    <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover-up">
+        <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mb-3">
+            <i class="fas fa-exclamation-circle text-red-500"></i>
+        </div>
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Belum Lunas</p>
+        <p class="text-2xl font-black text-red-500 mt-1">{{ belum_lunas or 0 }}</p>
+    </div>
+</div>
+
+<!-- =========================================================
+     TABEL RIWAYAT PENJUALAN
+========================================================= -->
+<div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+        <div>
+            <h2 class="font-black text-dombaGreen uppercase tracking-tight">Riwayat Transaksi</h2>
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Semua data penjualan domba</p>
+        </div>
+        <!-- Search Box -->
+        <div class="relative hidden md:block">
+            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+            <input type="text" id="searchInput" placeholder="Cari pembeli, struk..."
+                oninput="filterTable()"
+                class="pl-10 pr-4 py-2 bg-gray-50 rounded-xl text-xs font-bold text-gray-600 border-none focus:ring-2 focus:ring-dombaYellow w-56 transition-all">
+        </div>
+    </div>
+
+    {% if penjualan_list %}
+    <div class="overflow-x-auto">
+        <table class="w-full text-xs" id="penjualanTable">
+            <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                    <th class="text-left px-6 py-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">No. Struk</th>
+                    <th class="text-left px-4 py-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Pembeli</th>
+                    <th class="text-left px-4 py-4 font-black text-gray-400 uppercase tracking-widest text-[10px] hidden md:table-cell">Keterangan</th>
+                    <th class="text-center px-4 py-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Jml</th>
+                    <th class="text-right px-4 py-4 font-black text-gray-400 uppercase tracking-widest text-[10px] hidden md:table-cell">Total</th>
+                    <th class="text-center px-4 py-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Status</th>
+                    <th class="text-left px-4 py-4 font-black text-gray-400 uppercase tracking-widest text-[10px] hidden md:table-cell">Tanggal</th>
+                    <th class="text-center px-4 py-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for p in penjualan_list %}
+                <tr class="hover:bg-green-50/50 transition-all group">
+                    <!-- No Struk -->
+                    <td class="px-6 py-4">
+                        <span class="font-mono font-black text-dombaGreen text-[11px]">{{ p[1] }}</span>
+                    </td>
+                    <!-- Pembeli -->
+                    <td class="px-4 py-4">
+                        <p class="font-black text-gray-800 uppercase text-xs">{{ p[2] }}</p>
+                        {% if p[9] %}
+                        <p class="text-[10px] text-gray-400 font-bold">{{ p[9] }}</p>
+                        {% endif %}
+                    </td>
+                    <!-- Keterangan -->
+                    <td class="px-4 py-4 hidden md:table-cell">
+                        <p class="text-gray-500 max-w-[180px] truncate">{{ p[3] }}</p>
+                    </td>
+                    <!-- Jumlah -->
+                    <td class="px-4 py-4 text-center">
+                        <span class="bg-green-100 text-dombaGreen font-black px-3 py-1 rounded-full text-[10px]">
+                            {{ p[4] }} ekor
+                        </span>
+                    </td>
+                    <!-- Total -->
+                    <td class="px-4 py-4 text-right hidden md:table-cell">
+                        <p class="font-black text-gray-800">Rp {{ "{:,.0f}".format(p[5]|float) }}</p>
+                        <p class="text-[10px] text-gray-400">@ Rp {{ "{:,.0f}".format(p[11]|float if p[11] else 0) }}/ekor</p>
+                    </td>
+                    <!-- Status -->
+                    <td class="px-4 py-4 text-center">
+                        {% if p[7]|float > 0 %}
+                        <span class="bg-red-100 text-red-600 font-black px-3 py-1 rounded-full text-[10px]">
+                            Sisa Rp {{ "{:,.0f}".format(p[7]|float) }}
+                        </span>
+                        {% else %}
+                        <span class="bg-green-100 text-green-700 font-black px-3 py-1 rounded-full text-[10px]">
+                            ✅ Lunas
+                        </span>
+                        {% endif %}
+                    </td>
+                    <!-- Tanggal -->
+                    <td class="px-4 py-4 hidden md:table-cell">
+                        <p class="font-bold text-gray-500 text-[10px]">{{ p[8] }}</p>
+                    </td>
+                    <!-- Aksi: Lihat Struk + Download PDF saja (hapus dihilangkan) -->
+                    <td class="px-4 py-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <!-- Lihat Struk -->
+                            <a href="{{ url_for('struk_penjualan', id=p[0]) }}"
+                               title="Lihat & Cetak Struk"
+                               class="w-8 h-8 bg-dombaGreen rounded-xl flex items-center justify-center text-dombaYellow hover:bg-dombaDark transition-all">
+                                <i class="fas fa-receipt text-xs"></i>
+                            </a>
+                            <!-- Download PDF -->
+                            <a href="{{ url_for('cetak_struk_pdf', id=p[0]) }}"
+                               title="Download PDF"
+                               class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 hover:bg-blue-200 transition-all">
+                                <i class="fas fa-file-pdf text-xs"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-20">
+        <div class="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-store-alt text-3xl text-gray-300"></i>
+        </div>
+        <h3 class="font-black text-gray-400 uppercase tracking-wider mb-2">Belum Ada Transaksi</h3>
+        <p class="text-xs text-gray-300 font-bold mb-6">Klik tombol "Catat Penjualan Baru" untuk mulai mencatat.</p>
+        <button onclick="document.getElementById('modalPenjualan').classList.remove('hidden')"
+            class="px-6 py-3 bg-dombaGreen text-dombaYellow font-black uppercase text-xs tracking-widest rounded-2xl shadow-lg hover:bg-dombaDark transition-all">
+            <i class="fas fa-plus mr-2"></i> Catat Penjualan Pertama
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+
+<!-- =========================================================
+     MODAL: FORM TAMBAH PENJUALAN
+========================================================= -->
+<div id="modalPenjualan" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-[32px] w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+
+        <!-- Header Modal -->
+        <div class="bg-dombaGreen text-white p-8 rounded-t-[32px] relative overflow-hidden">
+            <div class="relative z-10">
+                <h3 class="text-xl font-black uppercase tracking-tighter">Catat Penjualan Domba</h3>
+                <p class="text-green-200 text-xs font-bold mt-1">Isi data pembeli dan detail domba yang dijual</p>
+            </div>
+            <i class="fas fa-store-alt absolute -right-4 -bottom-4 text-8xl opacity-10"></i>
+            <button onclick="document.getElementById('modalPenjualan').classList.add('hidden')"
+                class="absolute top-5 right-5 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all">
+                <i class="fas fa-times text-white text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form action="{{ url_for('tambah_penjualan') }}" method="POST" class="p-8 space-y-6">
+
+            <!-- No Struk + Tanggal -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">No. Struk</label>
+                    <div class="relative">
+                        <i class="fas fa-hashtag absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+                        <input type="text" name="no_struk" value="{{ no_struk_auto }}" required
+                            class="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-2xl font-mono font-bold text-dombaGreen text-sm border-none focus:ring-2 focus:ring-dombaYellow transition-all">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">Tanggal Transaksi</label>
+                    <div class="relative">
+                        <i class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+                        <input type="date" name="tanggal" id="inputTanggal" required
+                            value="{{ now.strftime('%Y-%m-%d') if now else '' }}"
+                            class="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-2xl font-bold text-gray-700 text-sm border-none focus:ring-2 focus:ring-dombaYellow transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nama Pembeli + No HP -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">Nama Pembeli</label>
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+                        <input type="text" name="nama_pembeli" required placeholder="Nama lengkap pembeli"
+                            class="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-2xl font-bold text-gray-700 text-sm border-none focus:ring-2 focus:ring-dombaYellow transition-all">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">No. HP <span class="text-gray-300">(opsional)</span></label>
+                    <div class="relative">
+                        <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+                        <input type="text" name="no_hp" placeholder="08xxxxxxxxxx"
+                            class="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-2xl font-bold text-gray-700 text-sm border-none focus:ring-2 focus:ring-dombaYellow transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Keterangan Domba -->
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">Keterangan / Jenis Domba</label>
+                <div class="relative">
+                    <textarea name="keterangan_domba" rows="2" required
+                        placeholder="Contoh: 3 Ekor domba jantan garut, berat 35-40 kg per ekor"
+                        class="w-full px-4 py-3 bg-gray-50 rounded-2xl font-bold text-gray-700 text-sm border-none focus:ring-2 focus:ring-dombaYellow transition-all resize-none"></textarea>
+                </div>
+                <!-- Pilih dari daftar domba aktif -->
+                {% if domba_tersedia %}
+                <div class="mt-2">
+                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Atau pilih dari daftar domba aktif:</p>
+                    <div class="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
+                        {% for d in domba_tersedia %}
+                        <button type="button"
+                            onclick="tambahKeteranganDomba('{{ d[1] }} ({{ d[2] }}, {{ d[3] }} kg, Tag: {{ d[4] }})')"
+                            class="text-[9px] font-black px-3 py-1.5 bg-green-50 text-dombaGreen border border-green-200 rounded-xl hover:bg-dombaGreen hover:text-dombaYellow transition-all">
+                            {{ d[1] }} — {{ d[2] }} — {{ d[3] }}kg
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Jumlah + Harga Per Ekor -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">Jumlah (Ekor)</label>
+                    <div class="relative">
+                        <i class="fas fa-sheep absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+                        <input type="number" name="jumlah" id="inputJumlah" min="1" value="1" required
+                            oninput="hitungTotal()"
+                            class="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-2xl font-bold text-gray-700 text-sm border-none focus:ring-2 focus:ring-dombaYellow transition-all">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">Harga Per Ekor (Rp)</label>
+                    <div class="relative">
+                        <i class="fas fa-tag absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+                        <input type="number" name="harga_per_ekor" id="inputHarga" min="0" placeholder="0" required
+                            oninput="hitungTotal()"
+                            class="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-2xl font-bold text-gray-700 text-sm border-none focus:ring-2 focus:ring-dombaYellow transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Otomatis -->
+            <div class="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">Total Harga</p>
+                    <p id="totalHargaDisplay" class="text-2xl font-black text-dombaGreen">Rp 0</p>
+                </div>
+                <i class="fas fa-calculator text-4xl text-green-200"></i>
+                <input type="hidden" name="total_harga" id="inputTotal" value="0">
+            </div>
+
+            <!-- Dibayar + Sisa -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">Jumlah Dibayar (Rp)</label>
+                    <div class="relative">
+                        <i class="fas fa-money-bill absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+                        <input type="number" name="terbayar" id="inputTerbayar" min="0" value="0"
+                            oninput="hitungSisa()"
+                            class="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-2xl font-bold text-gray-700 text-sm border-none focus:ring-2 focus:ring-dombaYellow transition-all">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">Sisa Tagihan</label>
+                    <div class="relative">
+                        <i class="fas fa-exclamation-circle absolute left-4 top-1/2 -translate-y-1/2 text-red-300 text-sm"></i>
+                        <input type="number" name="sisa_tagihan" id="inputSisa" readonly value="0"
+                            class="w-full pl-10 pr-4 py-3 bg-red-50 rounded-2xl font-bold text-red-500 text-sm border-none cursor-not-allowed">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol LUNAS -->
+            <button type="button" onclick="bayarLunas()"
+                class="w-full py-3 border-2 border-dashed border-green-300 text-dombaGreen font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-green-50 transition-all">
+                <i class="fas fa-check-circle mr-2 text-green-500"></i> Tandai Sebagai LUNAS
+            </button>
+
+            <!-- Catatan -->
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-dombaGreen uppercase tracking-widest">Catatan Tambahan <span class="text-gray-300">(opsional)</span></label>
+                <textarea name="catatan" rows="2"
+                    placeholder="Contoh: Pembayaran via transfer, domba dikirim tgl 20..."
+                    class="w-full px-4 py-3 bg-gray-50 rounded-2xl font-bold text-gray-500 text-sm border-none focus:ring-2 focus:ring-dombaYellow transition-all resize-none"></textarea>
+            </div>
+
+            <!-- Tombol Submit -->
+            <div class="flex gap-3 pt-2">
+                <button type="button"
+                    onclick="document.getElementById('modalPenjualan').classList.add('hidden')"
+                    class="flex-1 py-4 border-2 border-gray-200 text-gray-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-gray-50 transition-all">
+                    Batal
+                </button>
+                <button type="submit"
+                    class="flex-2 flex-grow py-4 bg-dombaGreen text-dombaYellow font-black uppercase text-xs tracking-widest rounded-2xl shadow-lg hover:bg-dombaDark transition-all btn-shine">
+                    <i class="fas fa-save mr-2"></i> Simpan & Cetak Struk
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- =========================================================
+     SCRIPT
+========================================================= -->
+<script>
+function hitungTotal() {
+    const jumlah = parseFloat(document.getElementById('inputJumlah').value) || 0;
+    const harga  = parseFloat(document.getElementById('inputHarga').value)  || 0;
+    const total  = jumlah * harga;
+    document.getElementById('inputTotal').value = total;
+    document.getElementById('totalHargaDisplay').textContent = 'Rp ' + total.toLocaleString('id-ID');
+    hitungSisa();
+}
+
+function hitungSisa() {
+    const total    = parseFloat(document.getElementById('inputTotal').value)    || 0;
+    const terbayar = parseFloat(document.getElementById('inputTerbayar').value) || 0;
+    document.getElementById('inputSisa').value = Math.max(0, total - terbayar);
+}
+
+function bayarLunas() {
+    const total = parseFloat(document.getElementById('inputTotal').value) || 0;
+    document.getElementById('inputTerbayar').value = total;
+    document.getElementById('inputSisa').value = 0;
+}
+
+function tambahKeteranganDomba(teks) {
+    const ta = document.querySelector('textarea[name="keterangan_domba"]');
+    if (ta.value && !ta.value.endsWith('\n')) ta.value += '\n';
+    ta.value += teks;
+}
+
+function filterTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('#penjualanTable tbody tr').forEach(tr => {
+        tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tglInput = document.getElementById('inputTanggal');
+    if (tglInput && !tglInput.value) {
+        tglInput.value = new Date().toISOString().split('T')[0];
+    }
+});
+
+document.getElementById('modalPenjualan').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.add('hidden');
+});
+</script>
+
+{% endblock %}

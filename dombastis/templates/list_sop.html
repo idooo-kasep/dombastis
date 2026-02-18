@@ -1,0 +1,119 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4" data-aos="fade-down">
+        <div>
+            <h1 class="text-4xl font-black text-[#2D5A27] uppercase italic tracking-tighter leading-none">Jadwal & SOP</h1>
+            <p class="text-gray-400 text-sm font-medium mt-1">Standar Operasional Prosedur & Rutinitas Kandang</p>
+        </div>
+        <div class="flex gap-3">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
+                <i class="fas fa-calendar-check text-yellow-500 text-xl"></i>
+                <span class="text-[10px] font-black text-[#2D5A27] uppercase tracking-widest">Shift Pagi & Sore Aktif</span>
+            </div>
+            {% if session['role'] == 'admin' %}
+            <a href="{{ url_for('tambah_sop') }}" class="bg-[#2D5A27] text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition shadow-lg flex items-center gap-2">
+                <i class="fas fa-plus"></i> Tambah Jadwal
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <div class="lg:col-span-4 space-y-6" data-aos="fade-right">
+            <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+                <h3 class="font-black text-[#2D5A27] text-sm uppercase tracking-widest mb-8 flex items-center gap-2">
+                    <i class="fas fa-clock text-yellow-500"></i> Timeline Harian
+                </h3>
+                <div class="relative border-l-2 border-dashed border-gray-100 ml-3 space-y-8">
+                    <div class="relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-yellow-400 border-4 border-white shadow-sm"></div>
+                        <p class="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-1">07:30 - 09:00</p>
+                        <h4 class="font-black text-[#2D5A27] text-sm uppercase">Pemberian Pakan Pagi</h4>
+                    </div>
+                    <div class="relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#2D5A27] border-4 border-white shadow-sm"></div>
+                        <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1">09:00 - 11:00</p>
+                        <h4 class="font-black text-[#2D5A27] text-sm uppercase">Sanitasi & Monitoring</h4>
+                    </div>
+                    <div class="relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-200 border-4 border-white shadow-sm"></div>
+                        <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1">15:30 - 17:00</p>
+                        <h4 class="font-black text-[#2D5A27] text-sm uppercase">Pemberian Pakan Sore</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-[#2D5A27] p-8 rounded-[40px] text-white shadow-xl shadow-[#2D5A27]/20 relative overflow-hidden">
+                <i class="fas fa-lightbulb text-yellow-400 text-3xl mb-4 relative z-10"></i>
+                <h4 class="font-black uppercase italic tracking-tighter text-lg leading-tight relative z-10">Kebersihan adalah Kunci</h4>
+                <p class="text-white/60 text-xs mt-2 leading-relaxed relative z-10">Pastikan tandon air dibersihkan setiap minggu untuk mencegah bakteri.</p>
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-10 -mt-10"></div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-8 space-y-6" data-aos="fade-left">
+            <h3 class="font-black text-[#2D5A27] text-sm uppercase tracking-widest px-4 flex items-center gap-2">
+                <i class="fas fa-book-open text-yellow-500"></i> Instruksi Kerja Dinamis (Dari Database)
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for s in sops %}
+                <div class="bg-white p-6 rounded-[35px] border border-gray-100 hover:shadow-xl transition-all duration-300 group relative">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 rounded-2xl bg-green-50 text-[#2D5A27] flex items-center justify-center group-hover:bg-[#2D5A27] group-hover:text-white transition duration-500">
+                            <i class="fas fa-clipboard-list text-xl"></i>
+                        </div>
+                        <span class="text-[10px] font-black bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full uppercase italic">
+                            {{ s[2] }}
+                        </span>
+                    </div>
+                    <h4 class="font-black text-[#2D5A27] uppercase text-sm tracking-tight mb-1">{{ s[1] }}</h4>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-3 italic">PJ: {{ s[4] }}</p>
+                    <div class="bg-gray-50 rounded-2xl p-4 mb-4">
+                        <p class="text-[11px] text-gray-500 leading-relaxed">
+                            <span class="font-bold text-[#2D5A27]">Takaran:</span> {{ s[3] }}<br>
+                            <span class="font-bold text-[#2D5A27]">Detail:</span> {{ s[5] }}
+                        </p>
+                    </div>
+                    {% if session['role'] == 'admin' %}
+                    <div class="flex gap-2">
+                        <a href="{{ url_for('edit_sop', id=s[0]) }}" class="text-[9px] font-black text-blue-400 uppercase hover:text-blue-600 transition">Edit</a>
+                        <span class="text-gray-200">|</span>
+                        <a href="{{ url_for('hapus_sop', id=s[0]) }}" onclick="return confirm('Hapus jadwal ini?')" class="text-[9px] font-black text-red-400 uppercase hover:text-red-600 transition">Hapus</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="col-span-2 p-12 bg-white rounded-[35px] border-2 border-dashed border-gray-100 text-center">
+                    <i class="fas fa-folder-open text-gray-200 text-4xl mb-4"></i>
+                    <p class="text-gray-400 italic text-sm font-medium">Belum ada instruksi dinamis. Klik "Tambah Jadwal" untuk mengisi.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h3 class="font-black text-[#2D5A27] text-sm uppercase tracking-widest px-4 pt-8 flex items-center gap-2">
+                <i class="fas fa-shield-alt text-yellow-500"></i> Protokol Tetap Kandang
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
+                <div class="bg-white p-6 rounded-[35px] border border-gray-100 hover:shadow-md transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+                        <i class="fas fa-spray-can text-sm"></i>
+                    </div>
+                    <h4 class="font-black text-[#2D5A27] uppercase text-[12px] mb-2">Sanitasi Mingguan</h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed">• Semprot disinfektan 2x seminggu secara merata.</p>
+                </div>
+                <div class="bg-white p-6 rounded-[35px] border border-gray-100 hover:shadow-md transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center mb-4">
+                        <i class="fas fa-stethoscope text-sm"></i>
+                    </div>
+                    <h4 class="font-black text-[#2D5A27] uppercase text-[12px] mb-2">Pengecekan Medis</h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed">• Cek mata dan kuku domba setiap pagi saat pemberian pakan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

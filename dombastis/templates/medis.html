@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-8 space-y-6">
+    
+    <div class="bg-white rounded-[30px] shadow-xl overflow-hidden border border-gray-100 animate__animated animate__fadeInDown">
+        <div class="bg-teal-600 p-8 text-white flex justify-between items-center">
+            <div>
+                <h3 class="text-2xl font-black uppercase italic">Rekam Medis & Kesehatan</h3>
+                <p class="text-teal-100 text-xs font-bold uppercase tracking-widest">Pantau Kesehatan & Jadwal Vaksinasi</p>
+            </div>
+            <i class="fas fa-stethoscope text-4xl opacity-20 animate__animated animate__pulse animate__infinite"></i>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div data-aos="fade-right" class="lg:col-span-1">
+            <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 hover-up sticky top-24">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center text-teal-600">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h4 class="font-black text-gray-800 uppercase text-sm italic">Input Rekam Medis</h4>
+                </div>
+                
+                <form action="{{ url_for('rekam_medis') }}" method="POST" class="space-y-4">
+                    <div>
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Pilih Domba</label>
+                        <select name="id_domba" class="w-full p-3 rounded-2xl bg-gray-50 border-none text-sm focus:ring-2 focus:ring-teal-500" required>
+                            <option value="">-- Pilih Domba --</option>
+                            {% for d in domba_list %}
+                            <option value="{{ d[0] }}">{{ d[1] }} (Tag: {{ d[2] }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Jenis Tindakan</label>
+                        <select name="jenis_tindakan" class="w-full p-3 rounded-2xl bg-gray-50 border-none text-sm focus:ring-2 focus:ring-teal-500">
+                            <option value="Vaksinasi">Vaksinasi</option>
+                            <option value="Pemberian Obat">Pemberian Obat</option>
+                            <option value="Pemeriksaan Rutin">Pemeriksaan Rutin</option>
+                            <option value="Pengobatan Sakit">Pengobatan Sakit</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Tanggal</label>
+                        <input type="date" name="tanggal" class="w-full p-3 rounded-2xl bg-gray-50 border-none text-sm" required>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Detail & Diagnosa</label>
+                        <textarea name="detail" placeholder="Contoh: Pemberian obat cacing atau vaksin PMK..." class="w-full p-3 rounded-2xl bg-gray-50 border-none text-sm focus:ring-2 focus:ring-teal-500" rows="3" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-shine w-full bg-teal-600 text-white font-black py-4 rounded-2xl hover:bg-teal-700 transition shadow-lg uppercase tracking-widest text-xs">
+                        Simpan Rekam Medis
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div data-aos="fade-left" class="lg:col-span-2">
+            <div class="bg-white rounded-[30px] shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                    <h4 class="font-black text-gray-800 uppercase text-xs italic">Log Kesehatan Populasi</h4>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="text-gray-400 uppercase text-[10px] font-black border-b border-gray-50">
+                                <th class="px-6 py-4">Tanggal</th>
+                                <th class="px-6 py-4">Domba</th>
+                                <th class="px-6 py-4">Tindakan</th>
+                                <th class="px-6 py-4">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            {% for m in medis_logs %}
+                            <tr class="hover:bg-teal-50/30 transition group">
+                                <td class="px-6 py-4 font-medium text-gray-500">{{ m[3] }}</td>
+                                <td class="px-6 py-4">
+                                    <div class="font-black text-teal-700">{{ m[5] }}</div>
+                                    <div class="text-[10px] text-gray-400 uppercase">Tag: {{ m[6] }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase 
+                                        {% if m[2] == 'Vaksinasi' %} bg-blue-100 text-blue-600 
+                                        {% elif m[2] == 'Pengobatan Sakit' %} bg-red-100 text-red-600 
+                                        {% else %} bg-gray-100 text-gray-600 {% endif %}">
+                                        {{ m[2] }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-xs italic text-gray-500 group-hover:text-gray-700">{{ m[4] }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-10 text-center text-gray-400 italic">Belum ada data rekam medis.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

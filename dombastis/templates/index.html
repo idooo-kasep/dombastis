@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- ── KARTU STATISTIK ATAS ── -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div data-aos="zoom-in" data-aos-delay="0"
+             class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover-up">
+            <div class="w-12 h-12 rounded-2xl bg-dombaGreen/10 flex items-center justify-center text-dombaGreen flex-shrink-0">
+                <i class="fas fa-sheep text-xl"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Populasi</p>
+                <h3 class="text-2xl font-black text-dombaGreen leading-none">{{ total }} <span class="text-sm font-semibold text-gray-400">Ekor</span></h3>
+            </div>
+        </div>
+
+        <div data-aos="zoom-in" data-aos-delay="80"
+             class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover-up">
+            <div class="w-12 h-12 rounded-2xl bg-dombaYellow/10 flex items-center justify-center text-yellow-600 flex-shrink-0">
+                <i class="fas fa-weight text-xl"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Avg. Berat</p>
+                <h3 class="text-2xl font-black text-dombaGreen leading-none">{{ rata_rata }} <span class="text-sm font-semibold text-gray-400">Kg</span></h3>
+            </div>
+        </div>
+
+        <div data-aos="zoom-in" data-aos-delay="160"
+             class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover-up">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 flex-shrink-0">
+                <i class="fas fa-home text-xl"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kandang Barat</p>
+                <h3 class="text-2xl font-black text-dombaGreen leading-none">{{ barat }} <span class="text-sm font-semibold text-gray-400">Ekor</span></h3>
+            </div>
+        </div>
+
+        <div data-aos="zoom-in" data-aos-delay="240"
+             class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover-up">
+            <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-500 flex-shrink-0">
+                <i class="fas fa-home text-xl"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kandang Timur</p>
+                <h3 class="text-2xl font-black text-dombaGreen leading-none">{{ timur }} <span class="text-sm font-semibold text-gray-400">Ekor</span></h3>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── SHORTCUT MENU ── -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <a href="{{ url_for('list_keuangan_kas') }}"
+           class="p-4 bg-white border border-gray-100 rounded-2xl hover:border-dombaGreen hover:shadow-md transition text-center group hover-up">
+            <div class="text-2xl mb-1.5 group-hover:scale-110 transition-transform">💰</div>
+            <span class="text-[10px] font-black uppercase tracking-tighter text-gray-600">Keuangan</span>
+        </a>
+        <a href="{{ url_for('list_sop') }}"
+           class="p-4 bg-white border border-gray-100 rounded-2xl hover:border-blue-400 hover:shadow-md transition text-center group hover-up">
+            <div class="text-2xl mb-1.5 group-hover:scale-110 transition-transform">📋</div>
+            <span class="text-[10px] font-black uppercase tracking-tighter text-gray-600">Jadwal SOP</span>
+        </a>
+        <a href="{{ url_for('tugas') }}"
+           class="p-4 bg-white border border-gray-100 rounded-2xl hover:border-dombaYellow hover:shadow-md transition text-center group hover-up">
+            <div class="text-2xl mb-1.5 group-hover:scale-110 transition-transform">✅</div>
+            <span class="text-[10px] font-black uppercase tracking-tighter text-gray-600">Laporan Tugas</span>
+        </a>
+        {% if session.get('role') == 'admin' %}
+        <a href="{{ url_for('list_penjualan') }}"
+           class="p-4 bg-dombaGreen/5 border border-dombaGreen/20 rounded-2xl hover:bg-dombaGreen hover:shadow-md transition text-center group hover-up">
+            <div class="text-2xl mb-1.5 group-hover:scale-110 transition-transform">🐑</div>
+            <span class="text-[10px] font-black uppercase tracking-tighter text-dombaGreen group-hover:text-dombaYellow transition">Jual Domba</span>
+        </a>
+        {% else %}
+        <a href="{{ url_for('list_users') }}"
+           class="p-4 bg-white border border-gray-100 rounded-2xl hover:border-purple-400 hover:shadow-md transition text-center group hover-up">
+            <div class="text-2xl mb-1.5 group-hover:scale-110 transition-transform">👥</div>
+            <span class="text-[10px] font-black uppercase tracking-tighter text-gray-600">Karyawan</span>
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- ── SMART INSIGHT BANNER ── -->
+    <div data-aos="fade-up"
+         class="bg-gradient-to-r from-dombaGreen to-dombaDark rounded-3xl p-6 md:p-8 text-white relative overflow-hidden shadow-xl">
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+            <div class="max-w-xl">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="bg-dombaYellow text-dombaGreen text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">AI Smart Insight</span>
+                    <span class="text-xs opacity-50">Status Kandang: Optimal</span>
+                </div>
+                <p class="text-base font-medium leading-relaxed opacity-90 italic">
+                    "Populasi saat ini: <strong>{{ total }} ekor</strong> — {{ barat }} di Kandang Barat, {{ timur }} di Kandang Timur.
+                    Pastikan sirkulasi udara di Kandang <strong>{{ 'Barat' if barat > timur else 'Timur' }}</strong> terjaga karena populasinya lebih padat."
+                </p>
+            </div>
+            <div class="hidden lg:flex flex-col items-center gap-2 text-right opacity-20">
+                <i class="fas fa-robot text-7xl"></i>
+            </div>
+        </div>
+        <!-- Dekorasi -->
+        <div class="absolute -top-10 -right-10 w-48 h-48 bg-white/5 rounded-full pointer-events-none"></div>
+        <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-white/5 rounded-full pointer-events-none"></div>
+    </div>
+
+    <!-- ── TABEL INVENTARIS + CHART ── -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Tabel Domba -->
+        <div data-aos="fade-right" class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                <div>
+                    <h3 class="font-black text-dombaGreen text-lg uppercase tracking-tight italic">Inventaris Ternak</h3>
+                    <p class="text-[10px] text-gray-400 font-bold">Daftar seluruh domba aktif</p>
+                </div>
+                {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('tambah_ternak') }}"
+                   class="btn-shine bg-dombaGreen text-dombaYellow text-[10px] font-black px-4 py-2.5 rounded-2xl hover:bg-dombaDark transition shadow-lg">
+                    <i class="fas fa-plus mr-1"></i> Tambah
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="overflow-x-auto">
+                {% if domba_list %}
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-[10px] uppercase text-gray-400 font-black tracking-widest">
+                        <tr>
+                            <th class="px-6 py-4">Info Domba</th>
+                            <th class="px-4 py-4 text-center">Lokasi</th>
+                            <th class="px-4 py-4 text-center">Kamar</th>
+                            <th class="px-4 py-4">Berat</th>
+                            {% if session.get('role') == 'admin' %}
+                            <th class="px-4 py-4 text-center">Aksi</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 text-sm">
+                        {% for d in domba_list %}
+                        <tr class="hover:bg-gray-50/60 transition cursor-pointer"
+                            onclick="window.location='/domba/{{ d[0] }}'">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <span class="bg-gray-100 text-gray-500 px-2 py-0.5 rounded text-[9px] font-mono font-bold">#{{ d[4] }}</span>
+                                    <div>
+                                        <p class="font-black text-dombaGreen uppercase text-xs">{{ d[1] }}</p>
+                                        <p class="text-[10px] text-gray-400 font-bold">{{ d[5] }} · {{ d[2] }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4 text-center">
+                                <span class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase
+                                             {{ 'bg-yellow-100 text-yellow-700' if d[6]=='Barat' else 'bg-blue-100 text-blue-700' }}">
+                                    {{ d[6] }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-4 text-center">
+                                <span class="px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-lg text-xs font-black text-dombaGreen">{{ d[7] }}</span>
+                            </td>
+                            <td class="px-4 py-4 font-black text-dombaGreen italic">
+                                {{ d[3] }} <span class="text-[10px] font-normal text-gray-400">Kg</span>
+                            </td>
+                            {% if session.get('role') == 'admin' %}
+                            <td class="px-4 py-4" onclick="event.stopPropagation()">
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <a href="{{ url_for('edit', id=d[0]) }}"
+                                       class="w-8 h-8 rounded-xl bg-gray-50 text-gray-400 hover:bg-dombaYellow hover:text-dombaGreen flex items-center justify-center transition">
+                                        <i class="fas fa-edit text-xs"></i>
+                                    </a>
+                                    <a href="{{ url_for('hapus', id=d[0]) }}"
+                                       onclick="return confirm('Hapus domba ini?')"
+                                       class="w-8 h-8 rounded-xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition">
+                                        <i class="fas fa-trash-alt text-xs"></i>
+                                    </a>
+                                </div>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-16 text-gray-300">
+                    <i class="fas fa-sheep text-5xl mb-3"></i>
+                    <p class="font-black uppercase text-sm">Belum ada data domba</p>
+                    {% if session.get('role') == 'admin' %}
+                    <a href="{{ url_for('tambah_ternak') }}"
+                       class="mt-4 inline-block px-5 py-2.5 bg-dombaGreen text-dombaYellow font-black text-xs uppercase rounded-2xl">
+                        + Tambah Domba Pertama
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Chart & Gender -->
+        <div data-aos="fade-left" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="font-black text-gray-700 text-sm uppercase tracking-widest">Growth Chart</h3>
+                <i class="fas fa-chart-line text-dombaYellow"></i>
+            </div>
+
+            <div class="relative flex-1 min-h-[200px]">
+                <canvas id="chartBerat"></canvas>
+            </div>
+
+            <div class="mt-5 p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center mb-3">Distribusi Gender</p>
+                <div class="flex justify-around items-center">
+                    <div class="text-center">
+                        <span class="block text-2xl font-black text-blue-500">{{ jantan }}</span>
+                        <span class="text-[9px] font-bold text-gray-400 uppercase">♂ Jantan</span>
+                    </div>
+                    <div class="h-10 w-px bg-gray-200"></div>
+                    <div class="text-center">
+                        <span class="block text-2xl font-black text-pink-500">{{ betina }}</span>
+                        <span class="text-[9px] font-bold text-gray-400 uppercase">♀ Betina</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('chartBerat').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'Berat (Kg)',
+                data: {{ chart_data|safe }},
+                borderColor: '#0f4c3a',
+                backgroundColor: 'rgba(15,76,58,0.06)',
+                borderWidth: 3,
+                pointBackgroundColor: '#ffc107',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#9ca3af' } },
+                y: {
+                    beginAtZero: false,
+                    ticks: { color: '#9ca3af', font: { size: 10 } },
+                    grid: { color: '#f3f4f6', borderDash: [4,4] }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

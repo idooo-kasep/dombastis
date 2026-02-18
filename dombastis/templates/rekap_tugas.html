@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    
+    <div class="bg-white rounded-[30px] shadow-xl overflow-hidden border border-gray-100 mb-8">
+        <div class="bg-gradient-to-r from-dombaGreen to-green-700 p-8 text-white flex justify-between items-center">
+            <div>
+                <h3 class="text-2xl font-black uppercase italic tracking-wider">Monitoring Kerja Karyawan</h3>
+                <p class="text-dombaYellow text-xs font-bold uppercase tracking-[0.2em]">Real-time Log Operasional Dombastis</p>
+            </div>
+            <div class="bg-white/20 p-4 rounded-2xl backdrop-blur-sm">
+                <i class="fas fa-clipboard-check text-3xl text-dombaYellow"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[30px] shadow-2xl border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+            <h4 class="font-black text-dombaGreen uppercase italic text-sm">Riwayat Aktivitas Terakhir</h4>
+            <span class="text-[10px] bg-dombaGreen text-white px-3 py-1 rounded-full font-bold uppercase tracking-widest">Update Otomatis</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-100/50 text-dombaGreen font-black text-[11px] uppercase tracking-wider">
+                        <th class="p-5 border-b border-gray-100">Tanggal</th>
+                        <th class="p-5 border-b border-gray-100">Waktu Selesai</th>
+                        <th class="p-5 border-b border-gray-100">Nama Karyawan</th>
+                        <th class="p-5 border-b border-gray-100">Kegiatan SOP</th>
+                        <th class="p-5 border-b border-gray-100 text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700 text-xs font-bold">
+                    {% for r in rekap %}
+                    <tr class="border-b border-gray-50 hover:bg-green-50/30 transition-all duration-200">
+                        <td class="p-5 text-gray-400">
+                            <i class="far fa-calendar-alt mr-2 text-dombaGreen"></i>{{ r[0] }}
+                        </td>
+                        <td class="p-5 text-blue-600 font-black text-sm">
+                            <span class="bg-blue-50 px-3 py-1 rounded-lg border border-blue-100">
+                                {{ r[1] }}
+                            </span>
+                        </td>
+                        <td class="p-5 capitalize font-black text-gray-800">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3 text-dombaGreen border border-gray-300">
+                                    {{ r[2][0]|upper }}
+                                </div>
+                                {{ r[2] }}
+                            </div>
+                        </td>
+                        <td class="p-5 italic text-gray-600">
+                            {{ r[3] }}
+                            <div class="text-[10px] text-gray-400 not-italic font-normal uppercase">PJ: {{ r[4] }}</div>
+                        </td>
+                        <td class="p-5 text-center">
+                            <span class="bg-green-100 text-green-700 px-4 py-2 rounded-xl text-[10px] border border-green-200 shadow-sm flex items-center justify-center gap-2">
+                                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                SELESAI
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="p-20 text-center text-gray-400">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-inbox text-5xl mb-4 opacity-20"></i>
+                                <p class="italic text-lg font-medium">Belum ada laporan tugas yang masuk hari ini.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-4">
+            <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+            <div>
+                <h5 class="text-blue-800 font-bold text-sm">Tips Monitoring</h5>
+                <p class="text-blue-600 text-[11px] leading-relaxed">Gunakan rekap ini untuk memastikan pakan diberikan tepat waktu sesuai jadwal SOP (Pagi, Siang, Sore).</p>
+            </div>
+        </div>
+        <div class="bg-dombaYellow/10 p-4 rounded-2xl border border-dombaYellow/20 flex items-start gap-4">
+            <i class="fas fa-user-shield text-dombaGreen mt-1"></i>
+            <div>
+                <h5 class="text-dombaGreen font-bold text-sm">Keamanan Data</h5>
+                <p class="text-dombaGreen text-[11px] leading-relaxed">Halaman ini hanya dapat diakses oleh Admin (Owner). Data laporan tidak dapat diubah oleh karyawan setelah dikirim.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

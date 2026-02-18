@@ -1,0 +1,186 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-4xl font-black text-[#2D5A27] uppercase italic tracking-tighter leading-none">Manajemen Tugas</h1>
+            <p class="text-gray-400 text-sm font-medium mt-1">Laporan Operasional & Checklist Harian Kandang</p>
+        </div>
+        <div class="bg-white p-2 px-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center text-[#2D5A27] shadow-inner">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-gray-300 uppercase leading-none mb-1">Petugas Aktif</p>
+                <p class="text-xs font-black text-[#2D5A27] uppercase tracking-tighter">{{ session['username'] }} ({{ session['role'] }})</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- FORM INPUT LAPORAN -->
+        <div class="lg:col-span-1">
+            <form action="{{ url_for('tugas') }}" method="POST" class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 sticky top-8">
+                <h3 class="font-black text-[#2D5A27] text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <i class="fas fa-check-double text-yellow-400"></i> Input Laporan Harian
+                </h3>
+
+                <div class="space-y-3 mb-8">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Pilih Lokasi Kandang</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="lokasi_tugas" value="Barat" class="hidden peer" required>
+                            <div class="p-4 text-center rounded-[24px] border-2 border-gray-100 bg-white peer-checked:border-[#2D5A27] peer-checked:bg-[#2D5A27] peer-checked:text-white transition-all duration-300 shadow-sm">
+                                <i class="fas fa-arrow-left mb-1 text-lg group-hover:scale-110 transition"></i>
+                                <p class="font-black text-[10px] uppercase">Kandang Barat</p>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="lokasi_tugas" value="Timur" class="hidden peer" required>
+                            <div class="p-4 text-center rounded-[24px] border-2 border-gray-100 bg-white peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white transition-all duration-300 shadow-sm">
+                                <i class="fas fa-arrow-right mb-1 text-lg group-hover:scale-110 transition"></i>
+                                <p class="font-black text-[10px] uppercase">Kandang Timur</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    {% set tasks = [
+                        ('buat_pakan', 'Membuat Pakan', 'fa-mortar-pestle'),
+                        ('beri_pakan', 'Memberi Pakan', 'fa-utensils'),
+                        ('sapu_kandang', 'Menyapu Kandang', 'fa-broom'),
+                        ('disinfektan', 'Disinfektan', 'fa-spray-can'),
+                        ('bersih_tandon', 'Bersih Tandon', 'fa-water'),
+                        ('cek_garam', 'Cek Bambu Garam', 'fa-cube')
+                    ] %}
+
+                    {% for id, label, icon in tasks %}
+                    <label class="group flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl cursor-pointer hover:bg-white hover:shadow-md border border-transparent hover:border-gray-100 transition-all duration-200">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-gray-400 group-hover:text-[#2D5A27] shadow-sm">
+                                <i class="fas {{ icon }} text-xs"></i>
+                            </div>
+                            <span class="font-bold text-gray-700 text-sm">{{ label }}</span>
+                        </div>
+                        <input type="checkbox" name="{{ id }}" class="w-5 h-5 rounded-lg border-gray-200 text-[#2D5A27] focus:ring-[#2D5A27]">
+                    </label>
+                    {% endfor %}
+
+                    <div class="p-4 bg-gray-50/50 rounded-2xl flex items-center justify-between border border-transparent">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-gray-400 shadow-sm">
+                                <i class="fas fa-cut text-xs"></i>
+                            </div>
+                            <span class="font-bold text-gray-700 text-sm">Cukur Domba</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="number" name="cukur_domba" value="0" min="0" class="w-16 p-1 text-center bg-white border border-gray-200 rounded-lg font-black text-[#2D5A27] focus:ring-2 focus:ring-yellow-400">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Ekor</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <textarea name="catatan" placeholder="Ada kendala atau laporan kesehatan tambahan?" class="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-yellow-400 transition-all" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="w-full mt-6 bg-[#2D5A27] text-white py-5 rounded-[24px] font-black uppercase tracking-[0.2em] hover:bg-[#1a3a18] transition-all shadow-xl shadow-[#2D5A27]/20 hover:scale-[1.02] active:scale-95">
+                    Kirim Laporan Harian
+                </button>
+            </form>
+        </div>
+
+        <!-- TABEL RIWAYAT -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+                    <h3 class="font-black text-[#2D5A27] text-sm uppercase tracking-widest italic">Riwayat Kerja Kandang</h3>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Live Updates</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left min-w-[600px]">
+                        <thead class="bg-white text-[10px] uppercase text-gray-400 font-black tracking-widest border-b border-gray-50">
+                            <tr>
+                                <th class="px-8 py-5">Tgl & Lokasi</th>
+                                <th class="px-8 py-5">Aktivitas</th>
+                                <th class="px-8 py-5 text-center">Cukur</th>
+                                <th class="px-8 py-5">Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            {% for log in logs %}
+                            <tr class="hover:bg-gray-50/80 transition group">
+                                <td class="px-8 py-6">
+                                    {# Struktur log_kerja: 0=id, 1=user_id, 2=tanggal, 3=lokasi_kandang,
+                                       4=buat_pakan, 5=beri_pakan, 6=sapu_kandang, 7=cukur_domba,
+                                       8=disinfektan, 9=bersih_tandon, 10=cek_garam, 11=catatan
+                                       (admin: 12=username dari JOIN) #}
+                                    <p class="font-black text-[#2D5A27] text-sm leading-none">{{ log[2] }}</p>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        {% if log[3] == 'Barat' %}
+                                        <span class="px-2 py-0.5 bg-[#2D5A27] text-yellow-400 text-[9px] font-black rounded-md shadow-sm italic uppercase">BARAT</span>
+                                        {% elif log[3] == 'Timur' %}
+                                        <span class="px-2 py-0.5 bg-blue-600 text-white text-[9px] font-black rounded-md shadow-sm italic uppercase">TIMUR</span>
+                                        {% endif %}
+                                        {% if session['role'] == 'admin' and log|length > 12 %}
+                                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter italic">By: {{ log[12] }}</span>
+                                        {% else %}
+                                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter italic">By: {{ session['username'] }}</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <div class="flex gap-1.5 flex-wrap max-w-[200px]">
+                                        {% if log[4] %}<span title="Buat Pakan" class="w-7 h-7 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-xs shadow-sm"><i class="fas fa-mortar-pestle"></i></span>{% endif %}
+                                        {% if log[5] %}<span title="Beri Pakan" class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs shadow-sm"><i class="fas fa-utensils"></i></span>{% endif %}
+                                        {% if log[6] %}<span title="Sapu Kandang" class="w-7 h-7 rounded-lg bg-yellow-100 text-yellow-600 flex items-center justify-center text-xs shadow-sm"><i class="fas fa-broom"></i></span>{% endif %}
+                                        {% if log[8] %}<span title="Disinfektan" class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xs shadow-sm"><i class="fas fa-spray-can"></i></span>{% endif %}
+                                        {% if log[9] %}<span title="Bersih Tandon" class="w-7 h-7 rounded-lg bg-cyan-100 text-cyan-600 flex items-center justify-center text-xs shadow-sm"><i class="fas fa-water"></i></span>{% endif %}
+                                        {% if log[10] %}<span title="Cek Garam" class="w-7 h-7 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-xs shadow-sm"><i class="fas fa-cube"></i></span>{% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6 text-center">
+                                    <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 border-2 border-gray-100 font-black text-[#2D5A27] group-hover:bg-[#2D5A27] group-hover:text-white group-hover:border-[#2D5A27] transition-all shadow-sm">
+                                        {{ log[7] }}
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <p class="text-xs text-gray-500 italic max-w-[150px] truncate group-hover:whitespace-normal group-hover:overflow-visible transition-all">
+                                        {{ log[11] if log[11] else 'Tidak ada catatan.' }}
+                                    </p>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-8 py-24 text-center">
+                                    <div class="flex flex-col items-center opacity-20">
+                                        <i class="fas fa-clipboard-list text-6xl mb-4 text-[#2D5A27]"></i>
+                                        <p class="font-black uppercase tracking-widest text-sm italic">Belum ada laporan harian</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-6 bg-gray-50/50 border-t border-gray-50 text-center">
+                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Dombastis Operations Log System v2.0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 1024px) {
+        .sticky { position: static !important; }
+    }
+</style>
+{% endblock %}

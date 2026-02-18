@@ -1,0 +1,86 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 flex justify-center">
+    <div data-aos="zoom-in" class="w-full max-w-2xl bg-white rounded-[40px] shadow-2xl overflow-hidden border border-gray-100">
+        
+        <div class="bg-[#2D5A27] p-10 text-white relative overflow-hidden">
+            <div class="relative z-10 flex items-center gap-5">
+                <div class="w-14 h-14 bg-yellow-400 rounded-2xl flex items-center justify-center text-[#2D5A27] shadow-lg animate__animated animate__pulse animate__infinite">
+                    <i class="fas fa-hand-holding-usd text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-black uppercase italic tracking-tighter">Input Transaksi</h3>
+                    <p class="text-yellow-400 text-[10px] font-black uppercase tracking-[0.3em]">Catat Pemasukan & Pengeluaran</p>
+                </div>
+            </div>
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+        </div>
+
+        <form method="POST" action="{{ url_for('tambah_keuangan') }}" class="p-10 space-y-8">
+            
+            <div class="space-y-2">
+                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Deskripsi Transaksi</label>
+                <input type="text" name="deskripsi" placeholder="Contoh: Penjualan 5 Ekor Domba Texel" 
+                    class="w-full p-5 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-bold text-gray-700 shadow-inner transition-all" required>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Jenis Arus Kas</label>
+                    <div class="relative">
+                        <select name="tipe" 
+                            class="w-full p-5 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-black text-[#2D5A27] shadow-inner cursor-pointer appearance-none transition-all" required>
+                            <option value="Masuk">Uang Masuk (Pemasukan)</option>
+                            <option value="Keluar">Uang Keluar (Pengeluaran)</option>
+                        </select>
+                        <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Kategori</label>
+                    <div class="relative">
+                        <select name="kategori" 
+                            class="w-full p-5 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-black text-[#2D5A27] shadow-inner cursor-pointer appearance-none transition-all" required>
+                            <option value="Penjualan">Penjualan Ternak</option>
+                            <option value="Pakan">Pembelian Pakan</option>
+                            <option value="Kesehatan">Obat & Vaksin</option>
+                            <option value="Gaji">Gaji Karyawan</option>
+                            <option value="Lainnya">Lain-lain</option>
+                        </select>
+                        <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Nominal (Rp)</label>
+                    <input type="number" name="nominal" placeholder="Contoh: 5000000" 
+                        class="w-full p-5 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-bold text-[#2D5A27] shadow-inner transition-all" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Tanggal Transaksi</label>
+                    <input type="date" name="tanggal" 
+                        class="w-full p-5 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-bold text-gray-700 shadow-inner transition-all" required>
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-6">
+                <a href="{{ url_for('list_keuangan') }}" 
+                    class="flex-1 py-5 text-center bg-gray-100 text-gray-400 rounded-[24px] font-black uppercase tracking-widest text-xs hover:bg-gray-200 transition-all">
+                    Batal
+                </a>
+                <button type="submit" 
+                    class="flex-[2] py-5 bg-[#2D5A27] text-white rounded-[24px] font-black uppercase tracking-widest text-xs shadow-xl shadow-[#2D5A27]/20 hover:bg-[#1a3a18] transform hover:-translate-y-1 transition-all btn-shine hover-up">
+                    Simpan Transaksi <i class="fas fa-save ml-2"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

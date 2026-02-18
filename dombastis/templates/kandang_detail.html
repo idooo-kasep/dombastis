@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+    <div>
+        <a href="{{ url_for('index') }}" class="text-dombaGreen font-bold text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-4 opacity-50 hover:opacity-100 transition-all">
+            <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+        </a>
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-[24px] {{ 'bg-dombaYellow text-dombaGreen' if lokasi == 'Barat' else 'bg-blue-500 text-white' }} flex items-center justify-center shadow-lg">
+                <i class="fas {{ 'fa-arrow-left' if lokasi == 'Barat' else 'fa-arrow-right' }} text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-4xl font-black text-dombaGreen uppercase italic tracking-tighter leading-none">
+                    Kandang <span class="{{ 'text-dombaYellow' if lokasi == 'Barat' else 'text-blue-500' }}">{{ lokasi }}</span>
+                </h1>
+                <p class="text-gray-400 font-medium text-sm mt-1">Manajemen unit khusus wilayah {{ lokasi }}.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white px-8 py-5 rounded-[32px] border border-gray-100 shadow-sm flex items-center gap-6">
+        <div class="text-right">
+            <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Kapasitas Terisi</p>
+            <p class="text-3xl font-black text-dombaGreen">{{ total }} <span class="text-xs font-bold text-gray-300 tracking-normal">Ekor</span></p>
+        </div>
+        <div class="w-px h-10 bg-gray-100"></div>
+        <i class="fas fa-th-large text-2xl text-gray-200"></i>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
+    <div class="lg:col-span-3 bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="font-black text-dombaGreen text-sm uppercase tracking-widest italic">Performa Berat Per Kamar (Avg Kg)</h3>
+            <i class="fas fa-chart-bar text-dombaYellow"></i>
+        </div>
+        <div class="h-48">
+            <canvas id="chartKamar"></canvas>
+        </div>
+    </div>
+
+    <div class="{{ 'bg-dombaYellow text-dombaGreen' if lokasi == 'Barat' else 'bg-blue-600 text-white' }} p-8 rounded-[40px] shadow-xl flex flex-col justify-center relative overflow-hidden transition-all">
+        <div class="relative z-10">
+            <p class="text-[10px] font-black uppercase opacity-60 tracking-[0.2em] mb-2">Insight Kandang</p>
+            <h4 class="text-xl font-bold leading-tight italic">
+                "Kamar dengan rata-rata berat tertinggi saat ini adalah **Kamar {{ kamar_labels[0] if kamar_labels else '-' }}**"
+            </h4>
+        </div>
+        <i class="fas fa-lightbulb absolute -bottom-4 -right-4 text-8xl opacity-10 rotate-12"></i>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h3 class="font-black text-dombaGreen text-sm uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-list-ul text-dombaYellow"></i> Daftar Penghuni
+                    </h3>
+                </div>
+
+                <div class="flex bg-white p-1 rounded-2xl border border-gray-200 shadow-sm">
+                    <button onclick="filterGender('all')" id="btn-all" class="px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all bg-dombaGreen text-white">Semua</button>
+                    <button onclick="filterGender('Jantan')" id="btn-jantan" class="px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all text-gray-400 hover:text-blue-500">Jantan</button>
+                    <button onclick="filterGender('Betina')" id="btn-betina" class="px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all text-gray-400 hover:text-pink-500">Betina</button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left" id="dombaTable">
+                    <thead class="bg-white text-[10px] uppercase text-gray-400 font-black tracking-widest border-b border-gray-50">
+                        <tr>
+                            <th class="px-8 py-6">Kamar</th>
+                            <th class="px-8 py-6">Ear Tag</th>
+                            <th class="px-8 py-6">Berat</th>
+                            <th class="px-8 py-6 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 text-sm">
+                        {% for d in domba_list %}
+                        <tr class="domba-row hover:bg-gray-50/80 transition cursor-pointer group" data-gender="{{ d[2] }}" onclick="window.location='/domba/{{ d[0] }}'">
+                            <td class="px-8 py-5">
+                                <span class="w-10 h-10 flex items-center justify-center bg-white border-2 border-gray-100 rounded-xl font-black text-dombaGreen shadow-sm group-hover:border-dombaGreen group-hover:bg-dombaGreen group-hover:text-white transition-all">
+                                    {{ d[7] if d[7] else '-' }}
+                                </span>
+                            </td>
+                            <td class="px-8 py-5">
+                                <p class="text-[10px] font-mono font-bold text-gray-400 mb-0.5">#{{ d[4] }}</p>
+                                <p class="font-black text-dombaGreen uppercase tracking-tight">{{ d[1] }}</p>
+                            </td>
+                            <td class="px-8 py-5 font-black text-dombaGreen">
+                                {{ d[3] }} <span class="text-[10px] font-normal text-gray-400 uppercase">Kg</span>
+                            </td>
+                            <td class="px-8 py-5 text-right" onclick="event.stopPropagation()">
+                                <a href="{{ url_for('edit', id=d[0]) }}" class="inline-flex w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-dombaYellow hover:text-dombaGreen items-center justify-center transition">
+                                    <i class="fas fa-exchange-alt text-xs"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="px-8 py-24 text-center text-gray-400 italic">Kandang Kosong.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="lg:col-span-1">
+        <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+            <h3 class="font-black text-dombaGreen text-sm uppercase tracking-widest italic mb-6 flex items-center gap-2">
+                <i class="fas fa-history text-dombaYellow"></i> Aktivitas Terakhir
+            </h3>
+
+            <div class="space-y-4">
+                {% for log in logs_kandang %}
+                <div class="p-4 bg-gray-50 rounded-[24px] border-l-4 {{ 'border-dombaYellow' if lokasi == 'Barat' else 'border-blue-500' }}">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-[10px] font-black text-gray-400 uppercase">{{ log[2] }}</p>
+                        {% if log[7] > 0 %}
+                        <span class="bg-dombaGreen text-white text-[9px] px-2 py-0.5 rounded-full font-bold">Cukur: {{ log[7] }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex flex-wrap gap-1 mb-3">
+                        {% if log[4] %}<span class="text-[8px] font-bold bg-white px-2 py-1 rounded shadow-sm text-dombaGreen uppercase">Pakan</span>{% endif %}
+                        {% if log[5] %}<span class="text-[8px] font-bold bg-white px-2 py-1 rounded shadow-sm text-dombaGreen uppercase">Beri</span>{% endif %}
+                        {% if log[6] %}<span class="text-[8px] font-bold bg-white px-2 py-1 rounded shadow-sm text-dombaGreen uppercase">Sapu</span>{% endif %}
+                        {% if log[8] %}<span class="text-[8px] font-bold bg-white px-2 py-1 rounded shadow-sm text-dombaGreen uppercase">Disin</span>{% endif %}
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[8px] font-black text-gray-500">
+                            {{ log[11][0].upper() if log[11] else '?' }}
+                        </div>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Oleh: {{ log[11] }}</p>
+                    </div>
+                </div>
+                {% else %}
+                <div class="py-12 text-center border-2 border-dashed border-gray-100 rounded-[30px]">
+                    <i class="fas fa-clipboard-list text-gray-200 text-3xl mb-2"></i>
+                    <p class="text-gray-300 italic text-xs px-4">Belum ada laporan kerja khusus kandang ini.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <a href="{{ url_for('tugas') }}" class="block w-full mt-6 py-3 text-center bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-dombaGreen rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">
+                Lihat Semua Tugas
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // --- LOGIKA FILTER TABEL ---
+    function filterGender(gender) {
+        const rows = document.querySelectorAll('.domba-row');
+        const buttons = document.querySelectorAll('[id^="btn-"]');
+
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-dombaGreen', 'text-white', 'text-blue-500', 'text-pink-500');
+            btn.classList.add('text-gray-400');
+        });
+
+        const activeBtn = document.getElementById('btn-' + gender.toLowerCase());
+        activeBtn.classList.remove('text-gray-400');
+        activeBtn.classList.add('bg-dombaGreen', 'text-white');
+
+        rows.forEach(row => {
+            if (gender === 'all' || row.getAttribute('data-gender') === gender) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // --- LOGIKA GRAFIK ---
+    const ctxKamar = document.getElementById('chartKamar').getContext('2d');
+    new Chart(ctxKamar, {
+        type: 'bar',
+        data: {
+            labels: {{ kamar_labels|safe }},
+            datasets: [{
+                label: 'Berat (Kg)',
+                data: {{ kamar_weights|safe }},
+                backgroundColor: '{{ "#0f4c3a" if lokasi == "Barat" else "#1d4ed8" }}',
+                borderRadius: 12,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { display: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}

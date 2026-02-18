@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-6 no-print">
+        <div class="flex gap-2">
+            <a href="{{ url_for('list_keuangan') }}" class="bg-white text-gray-400 px-4 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest border border-gray-100 shadow-sm hover:text-dombaGreen transition flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+            <button onclick="window.print()" class="bg-dombaGreen text-white px-6 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-dombaDark transition flex items-center gap-2">
+                <i class="fas fa-print"></i> Cetak Invoice
+            </button>
+        </div>
+
+        <div class="flex gap-2">
+            <button onclick="sendWA('input')" class="bg-green-500 text-white px-5 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-green-600 transition flex items-center gap-2">
+                <i class="fab fa-whatsapp text-lg"></i> Kirim ke Nomor Lain
+            </button>
+            <button onclick="sendWA('admin')" class="bg-blue-600 text-white px-5 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-blue-700 transition flex items-center gap-2">
+                <i class="fas fa-user-shield"></i> Lapor ke Admin
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white p-8 md:p-12 shadow-2xl border border-gray-100 relative min-h-[1123px] text-gray-900" id="printable-area">
+
+        <div class="flex items-start gap-6 border-b-2 border-dombaGreen pb-6 mb-8">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Dombastis" class="w-24 h-24 object-contain">
+            <div class="flex-1">
+                <h1 class="text-3xl font-black text-dombaGreen tracking-tight leading-none mb-1">Dombastis</h1>
+                <p class="text-[11px] font-bold text-gray-600 uppercase">Jl. Nglerep-Trayang, Kec Ngronggot, Nganjuk</p>
+                <p class="text-[11px] font-bold text-gray-600 uppercase">Telp: 0877-8750-2950</p>
+            </div>
+        </div>
+
+        <h2 class="text-center text-xl font-black uppercase tracking-[0.2em] text-gray-800 mb-8">Invoice Pembelian</h2>
+
+        <div class="flex justify-between mb-8 text-[12px]">
+            <div class="space-y-1">
+                <p class="font-bold text-gray-500 uppercase tracking-wider text-[10px]">Dikirim kepada:</p>
+                <p id="wa-nama" class="font-black text-dombaGreen uppercase text-base">{{ pelanggan_nama if pelanggan_nama else 'Pelanggan Setia' }}</p>
+                <p class="font-bold text-gray-600 leading-tight max-w-[300px]">{{ pelanggan_alamat if pelanggan_alamat else 'Alamat tidak tertera' }}</p>
+            </div>
+            <div class="text-right">
+                <p id="wa-inv" class="font-black text-dombaGreen text-xl italic mb-1">#INV-{{ transaksi[0] }}</p>
+                <p class="font-bold text-gray-500 uppercase tracking-widest text-[10px]">{{ hari_ini }}</p>
+                <p class="font-black text-gray-800 tracking-tighter">{{ transaksi[1] }}</p>
+            </div>
+        </div>
+
+        <div class="border-x-2 border-t-2 border-gray-800">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-dombaGreen text-white text-[11px] font-black uppercase tracking-widest">
+                        <th class="border-r-2 border-b-2 border-gray-800 p-2 w-12 text-center">No</th>
+                        <th class="border-r-2 border-b-2 border-gray-800 p-2 text-left">Produk</th>
+                        <th class="border-r-2 border-b-2 border-gray-800 p-2 w-24 text-center">Jumlah</th>
+                        <th class="border-r-2 border-b-2 border-gray-800 p-2 w-32 text-right">Harga</th>
+                        <th class="border-b-2 border-gray-800 p-2 w-40 text-right">Total Harga</th>
+                    </tr>
+                </thead>
+                <tbody class="text-[12px] font-bold text-gray-800">
+                    <tr class="h-12">
+                        <td class="border-r-2 border-b-2 border-gray-800 p-3 text-center">1</td>
+                        <td id="wa-produk" class="border-r-2 border-b-2 border-gray-800 p-3 uppercase">{{ transaksi[2] }}</td>
+                        <td class="border-r-2 border-b-2 border-gray-800 p-3 text-center">{{ jumlah if jumlah else '1' }}</td>
+                        <td class="border-r-2 border-b-2 border-gray-800 p-3 text-right">Rp {{ transaksi[3] }}</td>
+                        <td class="border-b-2 border-gray-800 p-3 text-right font-black">Rp {{ transaksi[3] }}</td>
+                    </tr>
+                    {% for i in range(2, 8) %}
+                    <tr class="h-10">
+                        <td class="border-r-2 border-b-2 border-gray-800 p-3 text-center text-gray-200">{{ i }}</td>
+                        <td class="border-r-2 border-b-2 border-gray-800 p-3"></td>
+                        <td class="border-r-2 border-b-2 border-gray-800 p-3"></td>
+                        <td class="border-r-2 border-b-2 border-gray-800 p-3"></td>
+                        <td class="border-b-2 border-gray-800 p-3"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="font-black bg-gray-50 text-[13px]">
+                        <td colspan="4" class="border-r-2 border-gray-800 p-3 text-right uppercase tracking-widest">Total Keseluruhan</td>
+                        <td id="wa-total" class="border-gray-800 p-3 text-right italic text-dombaGreen">Rp {{ transaksi[3] }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="text-[11px] space-y-4">
+                <div>
+                    <p class="font-black text-gray-800 text-[13px] mb-2 italic">Catatan Penting:</p>
+                    <p class="font-black uppercase border-b-2 border-dombaGreen inline-block pb-1 tracking-widest">Pembayaran Melalui</p>
+                    <div class="mt-3 font-black text-gray-800 leading-tight">
+                        <p class="text-sm">FARAH FAWZYAH HUSNANIATI</p>
+                        <p class="text-dombaGreen text-sm">Bank Mandiri 1710006188174</p>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-3 border-l-4 border-dombaGreen">
+                    <p class="font-black text-gray-700 italic">"Mohon sertakan bukti transaksi saat konfirmasi pembayaran untuk mempercepat verifikasi sistem."</p>
+                </div>
+            </div>
+
+            <div class="text-[12px]">
+                <table class="w-full mb-10 border-collapse">
+                    <tr class="font-black border-b border-gray-200">
+                        <td class="py-2">Total Tagihan</td>
+                        <td class="text-right py-2">Rp {{ transaksi[3] }}</td>
+                    </tr>
+                    <tr class="text-green-600 font-black border-b border-gray-800">
+                        <td class="py-2">- Telah Dibayar -</td>
+                        <td class="text-right py-2">Rp {{ dibayar if dibayar else '0' }}</td>
+                    </tr>
+                    <tr class="font-black text-lg text-dombaGreen italic">
+                        <td class="py-3 uppercase tracking-tighter">Sisa Tagihan</td>
+                        <td id="wa-sisa" class="text-right py-3 font-black">Rp {{ sisa if sisa else transaksi[3] }}</td>
+                    </tr>
+                </table>
+
+                <div class="text-right mt-16 px-4">
+                    <p class="text-[11px] font-bold italic text-gray-500">Hormat kami,</p>
+                    <p class="text-[11px] font-black uppercase mt-1 tracking-widest">Manager Dombastis</p>
+                    <div class="h-24"></div>
+                    <p class="font-black border-b-2 border-gray-800 inline-block uppercase italic px-6 text-sm">
+                        {{ session['username'] if session['username'] else 'Admin Dombastis' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Watermark" class="w-3/4">
+        </div>
+    </div>
+</div>
+
+<script>
+function sendWA(target) {
+    const nama = document.getElementById('wa-nama').innerText;
+    const inv = document.getElementById('wa-inv').innerText;
+    const produk = document.getElementById('wa-produk').innerText;
+    const total = document.getElementById('wa-total').innerText;
+    const sisa = document.getElementById('wa-sisa').innerText;
+
+    // Nomor Admin Utama
+    const noAdmin = "6287787502950";
+
+    let message = `*INVOICE DOMBASTIS FARM*%0A`;
+    message += `-----------------------------------%0A`;
+    message += `*No Invoice:* ${inv}%0A`;
+    message += `*Pelanggan:* ${nama}%0A`;
+    message += `*Produk:* ${produk}%0A`;
+    message += `*Total Tagihan:* ${total}%0A`;
+    message += `*Sisa Tagihan:* ${sisa}%0A`;
+    message += `-----------------------------------%0A`;
+    message += `Mohon melakukan pembayaran melalui:%0A`;
+    message += `*Bank Mandiri:* 1710006188174%0A`;
+    message += `*A/n:* Farah Fawzyah Husnaniati%0A`;
+    message += `%0ATerima kasih telah mempercayai Dombastis!`;
+
+    if (target === 'admin') {
+        window.open(`https://wa.me/${noAdmin}?text=${message}`, '_blank');
+    } else {
+        const hpManual = prompt("Masukkan nomor WhatsApp tujuan (contoh: 628123456789):");
+        if(hpManual) {
+            const cleanNum = hpManual.replace(/\D/g, ''); // Membersihkan karakter non-angka
+            window.open(`https://wa.me/${cleanNum}?text=${message}`, '_blank');
+        }
+    }
+}
+</script>
+
+<style>
+    @media print {
+        .bg-dombaGreen {
+            background-color: #0f4c3a !important;
+            -webkit-print-color-adjust: exact;
+            color: white !important;
+        }
+        .text-dombaGreen {
+            color: #0f4c3a !important;
+        }
+        body { background: white !important; }
+        .no-print { display: none !important; }
+        #printable-area {
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+    }
+</style>
+{% endblock %}

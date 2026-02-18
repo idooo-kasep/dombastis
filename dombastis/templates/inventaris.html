@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-8 space-y-6">
+
+    <div class="bg-white rounded-[30px] shadow-xl overflow-hidden border border-gray-100 animate__animated animate__fadeInDown">
+        <div class="bg-[#2D5A27] p-8 text-white flex justify-between items-center">
+            <div>
+                <h3 class="text-2xl font-black uppercase italic">Laporan Stok & Inventaris</h3>
+                <p class="text-yellow-400 text-xs font-bold uppercase tracking-widest">Manajemen Masuk/Keluar Barang & Domba</p>
+            </div>
+            <i class="fas fa-boxes text-4xl opacity-20 animate__animated animate__pulse animate__infinite"></i>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div data-aos="fade-right" class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 hover-up">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-[#2D5A27]">
+                    <i class="fas fa-shovels"></i>
+                </div>
+                <h4 class="font-black text-gray-800 uppercase text-sm italic">Input Mutasi Pakan</h4>
+            </div>
+
+            <form action="{{ url_for('inventaris') }}" method="POST" class="space-y-4">
+                <input type="text" name="nama_bahan" placeholder="Nama Bahan (ex: Konsentrat, Rumput)" class="w-full p-3 rounded-2xl bg-gray-50 border-none text-sm focus:ring-2 focus:ring-green-500 transition-all" required>
+                <div class="grid grid-cols-2 gap-4">
+                    <select name="jenis_mutasi" class="p-3 rounded-2xl bg-gray-50 border-none text-sm focus:ring-2 focus:ring-green-500">
+                        <option value="Masuk">Barang Masuk (+)</option>
+                        <option value="Keluar">Barang Keluar (-)</option>
+                    </select>
+                    <input type="number" step="0.01" name="jumlah" placeholder="Jumlah (Kg)" class="p-3 rounded-2xl bg-gray-50 border-none text-sm focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <input type="date" name="tanggal" class="w-full p-3 rounded-2xl bg-gray-50 border-none text-sm" required>
+                <textarea name="keterangan" placeholder="Keterangan tambahan..." class="w-full p-3 rounded-2xl bg-gray-50 border-none text-sm focus:ring-2 focus:ring-green-500" rows="2"></textarea>
+                <button type="submit" class="btn-shine w-full bg-[#2D5A27] text-white font-black py-4 rounded-2xl hover:bg-opacity-90 transition shadow-lg uppercase tracking-widest text-xs">
+                    Simpan Mutasi Pakan
+                </button>
+            </form>
+        </div>
+
+        <div data-aos="fade-left" class="bg-red-50 p-6 rounded-[30px] border border-red-100 hover-up">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <i class="fas fa-skull-crossbones animate__animated animate__shakeX animate__infinite animate__slow"></i>
+                </div>
+                <h4 class="font-black text-red-800 uppercase text-sm italic">Lapor Kematian Domba</h4>
+            </div>
+
+            <form action="{{ url_for('lapor_kematian') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-1 md:col-span-2">
+                    <label class="text-[10px] font-black text-red-400 uppercase ml-2">Pilih Domba:</label>
+                    <select name="id_domba" class="w-full p-3 rounded-xl border border-red-200 text-sm focus:ring-2 focus:ring-red-500" required>
+                        <option value="">-- Pilih dari Daftar Aktif --</option>
+                        {% for d in domba_list %}
+                        <option value="{{ d[0] }}">{{ d[1] }} (Tag: {{ d[2] }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-span-1">
+                    <label class="text-[10px] font-black text-red-400 uppercase ml-2">Tanggal:</label>
+                    <input type="date" name="tanggal" class="w-full p-3 rounded-xl border border-red-200 text-sm" required>
+                </div>
+
+                <div class="col-span-1">
+                    <label class="text-[10px] font-black text-red-400 uppercase ml-2">Foto Bukti:</label>
+                    <input type="file" name="foto" class="w-full p-2 text-[10px] bg-white rounded-xl border border-red-200 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100" accept="image/*" required>
+                </div>
+
+                <div class="col-span-1 md:col-span-2">
+                    <textarea name="keterangan" placeholder="Penyebab kematian / gejala yang teramati..." class="w-full p-3 rounded-xl border border-red-200 text-sm focus:ring-2 focus:ring-red-500" rows="2"></textarea>
+                </div>
+
+                <button type="submit" onclick="return confirm('Apakah Anda yakin? Domba ini akan dipindahkan ke riwayat kematian.')" class="btn-shine bg-red-600 text-white font-black py-4 rounded-xl hover:bg-red-700 transition md:col-span-2 shadow-lg uppercase tracking-widest text-xs">
+                    Kirim Laporan & Foto Bukti
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div data-aos="fade-up" class="bg-white rounded-[30px] shadow-sm border border-gray-100 overflow-hidden mt-6">
+        <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+            <h4 class="font-black text-gray-800 uppercase text-xs italic">Riwayat Mutasi Domba (Keluar/Mati)</h4>
+            <span class="text-[10px] bg-gray-200 px-2 py-1 rounded-md font-bold text-gray-500">Log Populasi</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="text-gray-400 uppercase text-[10px] font-black border-b border-gray-50">
+                        <th class="px-6 py-4">Tanggal</th>
+                        <th class="px-6 py-4">Nama Domba</th>
+                        <th class="px-6 py-4">Tipe Mutasi</th>
+                        <th class="px-6 py-4">Keterangan</th>
+                        <th class="px-6 py-4">Dokumentasi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for m in mutasi_domba %}
+                    <tr class="hover:bg-gray-50/50 transition">
+                        <td class="px-6 py-4 font-medium">{{ m[4] }}</td>
+                        <td class="px-6 py-4 font-black text-[#2D5A27]">{{ m[7] if m[7] else 'ID: ' ~ m[1] }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase {{ 'bg-red-100 text-red-600' if m[3] == 'Kematian' else 'bg-blue-100 text-blue-600' }}">
+                                {{ m[2] }} ({{ m[3] }})
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-xs italic text-gray-500">{{ m[5] }}</td>
+                        <td class="px-6 py-4 text-center">
+                            {% if m[6] %}
+                            <a href="{{ url_for('static', filename='uploads/kematian/' + m[6]) }}" target="_blank" class="bg-gray-100 p-2 rounded-lg text-[#2D5A27] hover:bg-green-100 transition inline-block">
+                                <i class="fas fa-camera text-sm"></i>
+                            </a>
+                            {% else %}
+                            <span class="text-gray-300">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div data-aos="fade-up" data-aos-delay="200" class="bg-white rounded-[30px] shadow-sm border border-gray-100 overflow-hidden mt-6">
+        <div class="p-6 bg-gray-50 border-b border-gray-100">
+            <h4 class="font-black text-gray-800 uppercase text-xs italic">Riwayat Stok Pakan & Bahan</h4>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="text-gray-400 uppercase text-[10px] font-black border-b border-gray-50">
+                        <th class="px-6 py-4">Tanggal</th>
+                        <th class="px-6 py-4">Bahan</th>
+                        <th class="px-6 py-4">Jenis</th>
+                        <th class="px-6 py-4 text-right">Jumlah</th>
+                        <th class="px-6 py-4">Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for p in pakan %}
+                    <tr class="hover:bg-gray-50/50 transition">
+                        <td class="px-6 py-4 font-medium text-xs">{{ p[4] }}</td>
+                        <td class="px-6 py-4 font-bold text-gray-700">{{ p[1] }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded text-[10px] font-black {{ 'bg-green-100 text-green-700' if p[2] == 'Masuk' else 'bg-orange-100 text-orange-700' }}">
+                                {{ p[2] }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right font-black text-[#2D5A27]">{{ p[3] }} Kg</td>
+                        <td class="px-6 py-4 text-xs text-gray-400 italic">{{ p[5] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 flex justify-center">
+    <div data-aos="zoom-in" class="w-full max-w-2xl bg-white rounded-[40px] shadow-2xl overflow-hidden border border-gray-100">
+
+        <div class="bg-[#2D5A27] p-10 text-white relative overflow-hidden">
+            <div class="relative z-10 flex items-center gap-5">
+                <div class="w-14 h-14 bg-yellow-400 rounded-2xl flex items-center justify-center text-[#2D5A27] shadow-lg animate__animated animate__pulse animate__infinite">
+                    <i class="fas fa-calendar-plus text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-black uppercase italic tracking-tighter">Tambah Jadwal / SOP</h3>
+                    <p class="text-yellow-400 text-[10px] font-black uppercase tracking-[0.3em]">Input Instruksi Kerja Karyawan</p>
+                </div>
+            </div>
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+        </div>
+
+        <form method="POST" class="p-10 space-y-8">
+
+            <div class="space-y-2">
+                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Nama Kegiatan</label>
+                <input type="text" name="kegiatan" placeholder="Contoh: Pakan Sore"
+                    class="w-full p-5 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-bold text-gray-700 shadow-inner transition-all" required>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Waktu Pelaksanaan</label>
+                    <input type="time" name="waktu"
+                        class="w-full p-5 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-bold text-gray-700 shadow-inner transition-all" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Takaran / Dosis</label>
+                    <input type="text" name="takaran" placeholder="Contoh: 2 Kg / Ekor"
+                        class="w-full p-5 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-bold text-gray-700 shadow-inner transition-all" required>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Penanggung Jawab (Area)</label>
+                <div class="relative">
+                    <select name="penanggung_jawab"
+                        class="w-full p-5 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-bold text-[#2D5A27] shadow-inner cursor-pointer appearance-none transition-all">
+                        <option value="Andik">Andik (Kandang Timur / A)</option>
+                        <option value="Fajar">Fajar (Kandang Barat-Tengah / B-C)</option>
+                        <option value="Semua">Semua Karyawan</option>
+                    </select>
+                    <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Instruksi Detail</label>
+                <textarea name="instruksi" rows="4" placeholder="Jelaskan langkah-langkah kerjanya di sini..."
+                    class="w-full p-6 bg-gray-50 rounded-[24px] border-2 border-transparent focus:border-yellow-400 focus:bg-white outline-none text-sm font-medium italic text-gray-600 shadow-inner transition-all"></textarea>
+            </div>
+
+            <div class="flex gap-4 pt-6">
+                <a href="{{ url_for('list_sop') }}"
+                    class="flex-1 py-5 text-center bg-gray-100 text-gray-400 rounded-[24px] font-black uppercase tracking-widest text-xs hover:bg-gray-200 transition-all">
+                    Batal
+                </a>
+                <button type="submit"
+                    class="flex-[2] py-5 bg-[#2D5A27] text-white rounded-[24px] font-black uppercase tracking-widest text-xs shadow-xl shadow-[#2D5A27]/20 hover:bg-[#1a3a18] transform hover:-translate-y-1 transition-all">
+                    Simpan Jadwal <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

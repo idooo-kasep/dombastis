@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+/* ===== PRINT STYLES — tidak bergantung Tailwind ===== */
+@media print {
+    /* Sembunyikan semua elemen halaman */
+    body > *,
+    .sidebar, nav, header, footer,
+    .no-print { display: none !important; }
+
+    /* Tampilkan hanya struk */
+    #area-cetak {
+        display: block !important;
+        position: fixed !important;
+        top: 0; left: 0;
+        width: 80mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+    }
+
+    /* Style struk saat dicetak — pakai inline styles supaya tidak butuh Tailwind */
+    .struk-wrap {
+        width: 80mm !important;
+        font-family: 'Courier New', Courier, monospace !important;
+        font-size: 10pt !important;
+        color: #000 !important;
+        background: white !important;
+    }
+    .struk-header {
+        background-color: #0f4c3a !important;
+        color: white !important;
+        text-align: center;
+        padding: 12px 8px;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .struk-header h1 { font-size: 14pt; font-weight: 900; margin: 0; }
+    .struk-header p  { font-size: 8pt; margin: 2px 0; }
+    .struk-header .sub { color: #ffc107; font-weight: 700; }
+    .struk-header .addr { color: #a7f3d0; }
+
+    .struk-dash { border: none; border-top: 1px dashed #999; margin: 6px 10px; }
+    .struk-section { padding: 6px 12px; }
+    .struk-row { display: flex; justify-content: space-between; font-size: 9pt; margin: 2px 0; }
+    .struk-row .label { color: #555; }
+    .struk-row .val { font-weight: 700; }
+    .struk-title { font-size: 9pt; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #0f4c3a; }
+    .struk-total-row { display: flex; justify-content: space-between; font-size: 10pt; font-weight: 900; margin: 2px 0; }
+    .struk-lunas { color: #16a34a; font-weight: 900; }
+    .struk-sisa  { color: #dc2626; font-weight: 900; border-top: 1px dotted #fca5a5; padding-top: 4px; margin-top: 4px; }
+    .struk-footer { text-align: center; padding: 8px; font-size: 8pt; color: #555; }
+    .struk-footer strong { color: #0f4c3a; display: block; margin-bottom: 3px; }
+    .struk-bank { text-align: center; font-size: 8pt; color: #888; padding: 0 10px 6px; }
+}
+
+/* ===== TAMPILAN PREVIEW DI BROWSER ===== */
+.struk-preview {
+    max-width: 340px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    border: 1px solid #f0f0f0;
+    font-family: 'Courier New', Courier, monospace;
+}
+.struk-preview .sp-header {
+    background: #0f4c3a;
+    color: white;
+    text-align: center;
+    padding: 20px 16px;
+}
+.struk-preview .sp-header h1 { font-size: 18px; font-weight: 900; margin: 0; letter-spacing: 2px; }
+.struk-preview .sp-header .sp-sub { color: #ffc107; font-size: 10px; font-weight: 700; margin: 3px 0; }
+.struk-preview .sp-header .sp-addr { color: #a7f3d0; font-size: 9px; margin: 1px 0; }
+
+.struk-preview .sp-dash { border: none; border-top: 2px dashed #e5e7eb; margin: 10px 14px; }
+.struk-preview .sp-section { padding: 8px 18px; }
+.struk-preview .sp-title { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; color: #0f4c3a; text-align: center; margin-bottom: 4px; }
+.struk-preview .sp-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin: 4px 0; }
+.struk-preview .sp-row .lbl { color: #888; }
+.struk-preview .sp-row .val { font-weight: 700; color: #222; }
+.struk-preview .sp-total-row { display: flex; justify-content: space-between; font-size: 12px; font-weight: 900; margin: 4px 0; }
+.struk-preview .sp-lunas { color: #16a34a; font-weight: 900; border-top: 1px dotted #bbf7d0; padding-top: 6px; margin-top: 6px; }
+.struk-preview .sp-sisa { color: #dc2626; font-weight: 900; border-top: 1px dotted #fecaca; padding-top: 6px; margin-top: 6px; }
+.struk-preview .sp-bank { text-align: center; font-size: 9px; color: #aaa; padding: 0 14px 8px; }
+.struk-preview .sp-footer { text-align: center; padding: 12px 14px 20px; font-size: 10px; color: #888; }
+.struk-preview .sp-footer strong { display: block; color: #0f4c3a; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+</style>
+
+<!-- TOMBOL AKSI (tidak dicetak) -->
+<div class="no-print flex items-center justify-between mb-6">
+    <a href="{{ url_for('list_penjualan') }}"
+       class="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-dombaGreen transition-all">
+        <i class="fas fa-arrow-left"></i> Kembali
+    </a>
+    <div class="flex gap-2">
+        <a href="{{ url_for('cetak_struk_pdf', id=transaksi[0]) }}"
+           class="flex items-center gap-2 bg-dombaGreen text-white px-5 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow hover:bg-dombaDark transition-all">
+            <i class="fas fa-file-pdf"></i> Download PDF
+        </a>
+        <button onclick="window.print()"
+           class="flex items-center gap-2 bg-dombaYellow text-dombaGreen px-5 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow hover:opacity-90 transition-all">
+            <i class="fas fa-print"></i> Cetak Struk
+        </button>
+    </div>
+</div>
+
+<!-- ===== AREA YANG DICETAK ===== -->
+<div id="area-cetak">
+
+    <!-- PREVIEW DI BROWSER -->
+    <div class="struk-preview no-for-print">
+        <div class="sp-header">
+            <h1>🐑 DOMBASTIS</h1>
+            <p class="sp-sub">House of Sheep</p>
+            <p class="sp-addr">Nglerep-Trayang, Ngronggot, Nganjuk</p>
+            <p class="sp-addr">WA: 0877-8750-2950</p>
+        </div>
+        <hr class="sp-dash">
+        <div class="sp-section">
+            <p class="sp-title">Struk Penjualan</p>
+            <p style="text-align:center;font-size:10px;color:#888;margin-top:2px;">{{ transaksi[1] }}</p>
+        </div>
+        <hr class="sp-dash">
+        <div class="sp-section">
+            <div class="sp-row"><span class="lbl">Tanggal</span><span class="val">{{ transaksi[8] }}</span></div>
+            <div class="sp-row"><span class="lbl">Pembeli</span><span class="val" style="text-transform:uppercase">{{ transaksi[2] }}</span></div>
+            {% if transaksi[9] %}<div class="sp-row"><span class="lbl">No. HP</span><span class="val">{{ transaksi[9] }}</span></div>{% endif %}
+        </div>
+        <hr class="sp-dash">
+        <div class="sp-section">
+            <p style="font-size:9px;font-weight:900;text-transform:uppercase;color:#aaa;letter-spacing:2px;margin-bottom:4px;">Detail Pembelian</p>
+            <p style="font-size:11px;font-weight:700;color:#0f4c3a;">{{ transaksi[3] }}</p>
+            <div class="sp-row" style="margin-top:4px;">
+                <span class="lbl">{{ transaksi[4] }} ekor × Rp {{ "{:,.0f}".format(transaksi[11]|float if transaksi[11] else (transaksi[5]|float / transaksi[4] if transaksi[4] else 0)) }}</span>
+                <span class="val">Rp {{ "{:,.0f}".format(transaksi[5]|float) }}</span>
+            </div>
+        </div>
+        <hr class="sp-dash">
+        <div class="sp-section">
+            <div class="sp-total-row"><span>TOTAL</span><span>Rp {{ "{:,.0f}".format(transaksi[5]|float) }}</span></div>
+            <div class="sp-row"><span class="lbl">Dibayar</span><span class="val" style="color:#16a34a;">Rp {{ "{:,.0f}".format(transaksi[6]|float) }}</span></div>
+            {% if transaksi[7]|float > 0 %}
+            <div class="sp-total-row sp-sisa"><span>SISA TAGIHAN</span><span>Rp {{ "{:,.0f}".format(transaksi[7]|float) }}</span></div>
+            {% else %}
+            <div class="sp-total-row sp-lunas"><span>STATUS</span><span>✅ LUNAS</span></div>
+            {% endif %}
+        </div>
+        {% if transaksi[10] %}
+        <hr class="sp-dash">
+        <div class="sp-section">
+            <p style="font-size:9px;font-weight:900;color:#aaa;text-transform:uppercase;letter-spacing:2px;">Catatan</p>
+            <p style="font-size:10px;font-style:italic;color:#555;margin-top:2px;">{{ transaksi[10] }}</p>
+        </div>
+        {% endif %}
+        <hr class="sp-dash">
+        <div class="sp-bank">
+            <p>Pembayaran via Bank Mandiri</p>
+            <p style="font-weight:700;color:#444;">1710006188174</p>
+            <p>A/N FARAH FAWZYAH HUSNANIATI</p>
+        </div>
+        <hr class="sp-dash">
+        <div class="sp-footer">
+            <strong>Terima Kasih</strong>
+            Barang yang sudah dibeli tidak dapat ditukar/dikembalikan
+            <p style="margin-top:8px;opacity:0.3;font-size:8px;font-style:italic;">--- Dombastis Farm ---</p>
+        </div>
+    </div>
+
+    <!-- VERSI CETAK (hanya muncul saat print) — pakai class struk-wrap -->
+    <div class="struk-wrap" style="display:none;">
+        <div class="struk-header">
+            <h1>DOMBASTIS</h1>
+            <p class="sub">House of Sheep</p>
+            <p class="addr">Nglerep-Trayang, Ngronggot, Nganjuk</p>
+            <p class="addr">WA: 0877-8750-2950</p>
+        </div>
+        <hr class="struk-dash">
+        <div class="struk-section" style="text-align:center;">
+            <span class="struk-title">Struk Penjualan</span><br>
+            <small>{{ transaksi[1] }}</small>
+        </div>
+        <hr class="struk-dash">
+        <div class="struk-section">
+            <div class="struk-row"><span class="label">Tanggal</span><span class="val">{{ transaksi[8] }}</span></div>
+            <div class="struk-row"><span class="label">Pembeli</span><span class="val">{{ transaksi[2]|upper }}</span></div>
+            {% if transaksi[9] %}<div class="struk-row"><span class="label">No. HP</span><span class="val">{{ transaksi[9] }}</span></div>{% endif %}
+        </div>
+        <hr class="struk-dash">
+        <div class="struk-section">
+            <div style="font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#0f4c3a;margin-bottom:3px;">Detail Pembelian</div>
+            <div style="font-size:9pt;font-weight:700;">{{ transaksi[3] }}</div>
+            <div class="struk-row" style="margin-top:3px;">
+                <span class="label">{{ transaksi[4] }} ekor × Rp {{ "{:,.0f}".format(transaksi[11]|float if transaksi[11] else (transaksi[5]|float / transaksi[4] if transaksi[4] else 0)) }}</span>
+                <span class="val">Rp {{ "{:,.0f}".format(transaksi[5]|float) }}</span>
+            </div>
+        </div>
+        <hr class="struk-dash">
+        <div class="struk-section">
+            <div class="struk-total-row"><span>TOTAL</span><span>Rp {{ "{:,.0f}".format(transaksi[5]|float) }}</span></div>
+            <div class="struk-row"><span class="label">Dibayar</span><span class="val struk-lunas">Rp {{ "{:,.0f}".format(transaksi[6]|float) }}</span></div>
+            {% if transaksi[7]|float > 0 %}
+            <div class="struk-sisa struk-total-row"><span>SISA TAGIHAN</span><span>Rp {{ "{:,.0f}".format(transaksi[7]|float) }}</span></div>
+            {% else %}
+            <div class="struk-lunas struk-total-row" style="border-top:1px dotted #86efac;padding-top:4px;"><span>STATUS</span><span>LUNAS</span></div>
+            {% endif %}
+        </div>
+        {% if transaksi[10] %}
+        <hr class="struk-dash">
+        <div class="struk-section">
+            <div style="font-size:8pt;font-weight:700;text-transform:uppercase;color:#aaa;">Catatan</div>
+            <div style="font-size:9pt;font-style:italic;margin-top:2px;">{{ transaksi[10] }}</div>
+        </div>
+        {% endif %}
+        <hr class="struk-dash">
+        <div class="struk-bank">
+            Pembayaran via Bank Mandiri<br>
+            <strong>1710006188174</strong><br>
+            A/N FARAH FAWZYAH HUSNANIATI
+        </div>
+        <hr class="struk-dash">
+        <div class="struk-footer">
+            <strong>TERIMA KASIH</strong>
+            Barang yang sudah dibeli<br>tidak dapat ditukar/dikembalikan<br>
+            <small>--- Dombastis Farm ---</small>
+        </div>
+    </div>
+
+</div><!-- end area-cetak -->
+
+<!-- INFO TIPS (tidak dicetak) -->
+<div class="no-print mt-6 max-w-sm mx-auto p-4 bg-green-50 rounded-2xl border border-green-100 flex items-start gap-3">
+    <i class="fas fa-info-circle text-green-500 mt-0.5 text-sm"></i>
+    <div>
+        <p class="text-xs font-black text-green-800 uppercase tracking-wider mb-1">Tips Cetak</p>
+        <p class="text-xs text-green-600">Klik <b>Cetak Struk</b> → pilih printer → klik Print. Atau <b>Download PDF</b> untuk kirim via WhatsApp.</p>
+    </div>
+</div>
+
+<script>
+// Saat print: tampilkan versi cetak, sembunyikan versi preview
+window.addEventListener('beforeprint', function() {
+    document.querySelector('.struk-wrap').style.display = 'block';
+    document.querySelector('.struk-preview').style.display = 'none';
+});
+window.addEventListener('afterprint', function() {
+    document.querySelector('.struk-wrap').style.display = 'none';
+    document.querySelector('.struk-preview').style.display = 'block';
+});
+</script>
+{% endblock %}

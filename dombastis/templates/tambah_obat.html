@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <a href="{{ url_for('list_obat') }}" class="inline-flex items-center gap-2 text-dombaGreen font-black text-xs uppercase tracking-widest mb-6 hover:gap-4 transition-all">
+        <i class="fas fa-arrow-left"></i> Kembali ke Katalog
+    </a>
+
+    <div class="bg-white rounded-[40px] shadow-xl overflow-hidden border border-gray-100">
+        <div class="bg-dombaGreen p-8 text-white relative">
+            <div class="relative z-10">
+                <h3 class="text-2xl font-black uppercase italic italic">Tambah Obat Baru</h3>
+                <p class="text-dombaYellow text-[10px] font-bold uppercase tracking-[0.2em]">Input Katalog Farmasi Dombastis</p>
+            </div>
+            <i class="fas fa-plus-medical text-6xl absolute right-8 top-1/2 -translate-y-1/2 opacity-10"></i>
+        </div>
+
+        <form action="{{ url_for('tambah_obat') }}" method="POST" class="p-8 md:p-10 space-y-6">
+            <div class="space-y-1">
+                <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Nama Obat / Jenis</label>
+                <input type="text" name="nama" placeholder="Contoh: ANTIBIOTIK, ATP, dll" required
+                       class="w-full bg-gray-50 border-0 rounded-2xl p-4 font-bold text-dombaGreen outline-none ring-1 ring-gray-200 focus:ring-2 focus:ring-dombaYellow transition">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Brand / Merk (Opsional)</label>
+                <input type="text" name="brand" placeholder="Contoh: NOVA TETRA, BIO ENERGY"
+                       class="w-full bg-gray-50 border-0 rounded-2xl p-4 font-bold text-dombaGreen outline-none ring-1 ring-gray-200 focus:ring-2 focus:ring-dombaYellow transition">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Fungsi / Kegunaan Utama</label>
+                <textarea name="fungsi" rows="3" placeholder="Jelaskan kegunaan obat ini untuk domba..." required
+                          class="w-full bg-gray-50 border-0 rounded-2xl p-4 font-bold text-dombaGreen outline-none ring-1 ring-gray-200 focus:ring-2 focus:ring-dombaYellow transition leading-relaxed"></textarea>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" 
+                        class="w-full bg-dombaGreen text-white font-black py-5 rounded-2xl shadow-xl shadow-dombaGreen/20 hover:bg-dombaDark hover:-translate-y-1 transition transform active:scale-95">
+                    SIMPAN KE KATALOG OBAT
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="mt-8 p-6 bg-yellow-50 rounded-[30px] border border-yellow-100 flex items-start gap-4">
+        <div class="w-10 h-10 bg-dombaYellow rounded-xl flex items-center justify-center text-dombaGreen shrink-0">
+            <i class="fas fa-lightbulb"></i>
+        </div>
+        <div>
+            <p class="text-xs font-bold text-yellow-900">Tips Input:</p>
+            <p class="text-[10px] text-yellow-700 italic leading-normal mt-1">Gunakan Huruf Kapital pada Nama Obat agar terlihat jelas oleh karyawan saat diakses melalui smartphone di kandang.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
